@@ -540,6 +540,7 @@ body.day .rec-alert{color:var(--earth)}
 .lm-in b{font-family:var(--num);font-weight:300;font-size:26px;line-height:1.15;color:rgba(244,234,224,.86)}
 .lm-in small{font-size:11.5px;line-height:1.35;color:rgba(244,234,224,.5)}
 .lm.busy .lm-in b,.lm:not(.ok):not(.bright):not(.dark) .lm-in b{font-family:inherit;font-size:16px;font-weight:400}
+.lm.band .lm-in b{font-family:inherit;font-size:22px;font-weight:400}
 .lm-res{display:flex;flex-direction:column;gap:1px;font-size:13px;line-height:1.45;color:rgba(244,234,224,.6)}
 .lm-res b{font-weight:400;color:rgba(244,234,224,.86)}
 .lm.ok .lm-res b{color:#a9c4aa}
@@ -547,29 +548,9 @@ body.day .rec-alert{color:var(--earth)}
 .lm.err .lm-note{color:#e7b39b}
 .lm-note{font-size:11.5px;line-height:1.45;color:rgba(244,234,224,.42);max-width:34em}
 .lm-acts{display:flex;justify-content:center}
-.lm-b,.batt-b{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;min-height:32px;border-radius:999px;border:1px solid rgba(244,234,224,.18);background:transparent;
+.lm-b{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;min-height:32px;border-radius:999px;border:1px solid rgba(244,234,224,.18);background:transparent;
   color:rgba(244,234,224,.72);font:inherit;font-size:12.5px;cursor:pointer}
 .lm-b svg.i{width:15px;height:15px}
-/* v9 เสียงช่วยหลับ */
-.mus{width:100%;max-width:380px;padding:12px 14px;border-radius:18px;border:1px solid rgba(244,234,224,.12);background:rgba(244,234,224,.04);text-align:left;display:flex;flex-direction:column;gap:10px}
-.mus.on{border-color:rgba(143,174,144,.35)}
-.mus .mon-h small{max-width:60%}
-.mus.on .mon-h small{color:#a9c4aa}
-.mus-ch{display:flex;flex-wrap:wrap;gap:6px}
-.mus-c{appearance:none;padding:6px 11px;border-radius:999px;border:1px solid rgba(244,234,224,.16);background:transparent;color:rgba(244,234,224,.66);font:inherit;font-size:12.5px;cursor:pointer}
-.mus-c[aria-pressed="true"]{background:rgba(244,234,224,.14);border-color:rgba(244,234,224,.3);color:rgba(244,234,224,.92)}
-.mus-ctl{display:flex;align-items:center;gap:12px}
-.mus-play{flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px 7px 11px;min-height:36px;border-radius:999px;border:0;background:rgba(244,234,224,.12);
-  color:rgba(244,234,224,.9);font:inherit;font-size:13px;cursor:pointer;max-width:58%}
-.mus-play span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mus-play svg.i{width:16px;height:16px;flex:none}
-.mus-play[aria-pressed="true"]{background:rgba(109,141,110,.35)}
-.mus-vol{flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(244,234,224,.45)}
-.mus-vol .range{flex:1;min-width:0;--fill:rgba(244,234,224,.55);--track:rgba(244,234,224,.14)}
-.mus-tm{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:rgba(244,234,224,.5)}
-.mus-tm .seg{flex:none;background:rgba(244,234,224,.06);padding:3px}
-.mus-tm .seg button{padding:5px 10px;font-size:12px;color:rgba(244,234,224,.55)}
-.mus-tm .seg button[aria-pressed="true"]{background:rgba(244,234,224,.16);color:rgba(244,234,224,.92)}
 .sleep .acts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px}
 .sleep .btn{background:rgba(244,234,224,.1);color:rgba(244,234,224,.86)}
 .sleep .btn.ghost{background:transparent;border-color:rgba(244,234,224,.18)}
@@ -583,7 +564,6 @@ body.day .rec-alert{color:var(--earth)}
 /* v9: ยังไม่เสียบ = แดงหม่นโทนดิน (ไม่ใช่แดงสด) · เสียบแล้ว = เขียวเซจ */
 .batt.bad{border-color:rgba(219,121,101,.6);background:rgba(219,121,101,.1);color:#f0a896}
 .batt.ok{border-color:rgba(143,174,144,.55);background:rgba(109,141,110,.12);color:#b4d0b5}
-.batt-b{flex:none;min-height:30px;padding:4px 11px;font-size:12px;color:inherit;border-color:currentColor}
 .mon{width:100%;max-width:380px;padding:12px 14px 10px;border-radius:18px;border:1px solid rgba(244,234,224,.12);background:rgba(244,234,224,.04);text-align:left}
 .mon-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .mon-h b{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:400;color:rgba(244,234,224,.82)}
@@ -649,7 +629,7 @@ body.day .rec-alert{color:var(--earth)}
 @media (min-width:860px){
   .sl-mid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);grid-template-rows:auto auto;column-gap:40px;row-gap:12px;max-width:900px;align-items:center}
   .sl-mid .lm{grid-column:1;grid-row:1 / span 2;max-width:none}
-  .sl-mid .mus,.sl-mid .mon{grid-column:2;max-width:none}
+  .sl-mid .mon{grid-column:2;grid-row:1 / span 2;max-width:none}
   .lm-dial{width:190px}
 }
 @media (min-width:860px) and (max-height:900px){.lm-dial{width:170px}}
@@ -696,8 +676,6 @@ body.day .rec-alert{color:var(--earth)}
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5 13.6 9l5.4 1.6-5.4 1.6L12 17.7l-1.6-5.5L5 10.6 10.4 9z"/><path d="M18.5 16.5l.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6z"/></symbol>
     <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></symbol>
     <symbol id="i-batt" viewBox="0 0 24 24"><rect x="3" y="7.5" width="16" height="9" rx="2.2"/><path d="M21 10.5v3M11.6 9.3l-2 3h3l-2 3"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5.5v13M15.5 5.5v13"/></symbol>
     <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4.5 8.5a1.5 1.5 0 0 1 1.5-1.5h2.2l1.4-2h4.8l1.4 2H18a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 18 19H6a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.3"/></symbol>
   </defs>
 </svg>
@@ -904,15 +882,6 @@ body.day .rec-alert{color:var(--earth)}
     <p class="lm-res" id="lm-res"></p>
     <p class="lm-note" id="lm-note"></p>
     <div class="lm-acts"><button class="lm-b" type="button" id="lm-adj"><svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg>ปรับแสงห้อง</button></div>
-  </div>
-  <div class="mus" id="mus" role="group" aria-label="เสียงช่วยหลับ">
-    <div class="mon-h"><b><svg class="i" aria-hidden="true"><use href="#i-sound"/></svg><span>เสียงช่วยหลับ</span></b><small id="mus-st">ยังไม่เปิด</small></div>
-    <div class="mus-ch" id="mus-ch"></div>
-    <div class="mus-ctl">
-      <button class="mus-play" type="button" id="mus-play" aria-pressed="false"></button>
-      <label class="mus-vol"><span>เบา</span><input class="range" type="range" id="mus-vol" min="5" max="100" step="1" aria-label="ระดับเสียง"><span>ดัง</span></label>
-    </div>
-    <div class="mus-tm"><span>เบาลงจนปิดใน</span><div class="seg" id="mus-tm"></div></div>
   </div>
   <div class="mon" id="mon" role="group" aria-label="วัดเสียงในห้อง">
     <div class="mon-h"><b><svg class="i" aria-hidden="true"><use href="#i-mic"/></svg><span id="mon-h">กำลังฟังเสียงในห้อง</span></b><small id="mon-src"></small></div>
@@ -1406,13 +1375,13 @@ function beginNight() {
   const sl = $("#sleep"); sl.classList.add("on"); sl.setAttribute("aria-hidden", "false");
   sleepSub();
   tick(); clockT = setInterval(tick, 10000);
-  lmReset(); musInit();
-  BATT.user = false; $("#batt").textContent = ""; startMonitor(); checkBattery();
+  lmReset();
+  $("#batt").textContent = ""; startMonitor(); checkBattery();
   setTimeout(() => $("#sleep-back").focus({ preventScroll: true }), 300);
 }
 function endSleep() {
   const sl = $("#sleep"); sl.classList.remove("on"); sl.setAttribute("aria-hidden", "true");
-  clearInterval(clockT); lmStop(); musStop(); stopMonitor();
+  clearInterval(clockT); lmStop(); stopMonitor();
   $("#sheet").classList.remove("over-sleep");
 }
 function wakeUp() {
@@ -1421,34 +1390,42 @@ function wakeUp() {
   setTimeout(() => dawn.classList.remove("on"), 3300);
 }
 
-/* ---------- วัดแสงในห้อง (v9 · แทนวงกลมนำหายใจ) ----------
-   เว็บอ่านเซนเซอร์แสงของมือถือไม่ได้ (AmbientLightSensor ไม่มีใน Safari/iPhone และ Chrome ปิดไว้) → ใช้กล้องหน้าประมาณค่า
-   เปิดกล้องราว 2 วินาที อ่านความสว่างเฉลี่ยของภาพย่อ 32×24 จุดในหน่วยความจำ ไม่แสดงภาพ ไม่บันทึกภาพ แล้วปิดกล้องทันที
-   lux จากค่ารับแสงของกล้อง (Chrome บน Android บอกเวลาเปิดชัตเตอร์และ ISO): lux ≈ 50·N² ÷ (t·ISO) × (ความสว่างภาพ ÷ เทากลาง 18%) · N ≈ 1.9 (เลนส์มือถือทั่วไป)
-   เครื่องที่ไม่บอกค่ารับแสง (iPhone ฯลฯ): ห้องมืด กล้องเปิดรับแสงเต็มที่แล้วภาพยังมืด → ประมาณจากความมืดของภาพ · ภาพสว่างปกติ = กล้องปรับเอง บอกได้แค่ "สว่างกว่าราว 10 lux"
-   เป็นค่าประมาณคร่าว ๆ (คลาดได้หลายเท่า) ไม่ใช่เครื่องวัดแสง */
+/* ---------- วัดแสงในห้อง (v9.1 · แทนวงกลมนำหายใจ) ----------
+   เว็บอ่านเซนเซอร์แสงของมือถือไม่ได้ (AmbientLightSensor ไม่มีใน Safari/iPhone และ Chrome ปิดไว้) → ใช้กล้องหน้าเป็นเครื่องวัดแสง
+   เปิดกล้องราว 2–3 วินาที อ่านความสว่างเฉลี่ยของภาพย่อ 32×24 จุดในหน่วยความจำ ไม่แสดง ไม่บันทึกภาพ แล้วปิดกล้องทันที
+   วิธี A "ค่าจริงจากกล้อง" (เบราว์เซอร์ที่บอกเวลาเปิดชัตเตอร์ + ISO: Chrome บน Android):
+     1) ให้กล้องวัดแสงเองก่อน อ่านชัตเตอร์ t, ISO และความสว่างภาพ  2) ถ้าล็อกค่าได้ (exposureMode "manual") ตั้งชัตเตอร์ให้ภาพสว่างราวเทากลางแล้ววัดซ้ำ (ไม่ให้ภาพมืดจมหรือขาวโพลน)
+     3) lux = C · N² ÷ (t · ISO) × (ความสว่างภาพเชิงเส้น ÷ 0.18) · C = 250 ค่ามาตรฐานเครื่องวัดแสงตกกระทบ (ISO 2720) · N = 1.9 (รูรับแสงกล้องหน้ามือถือ 1.8–2.2)
+        ตัวอย่างตรวจ: ห้อง 150 lux ISO 400 กล้องเลือก 1/66 วิ → 150 · คลาดได้ราว ±50% (รูรับแสงจริง สีเพดาน/ผนังที่กล้องมอง ค่า ISO ของแต่ละรุ่น)
+   วิธี B "ช่วงโดยประมาณ" (Safari บน iPhone/Mac, Firefox, กล้องคอม: ไม่บอกค่ากล้อง กล้องปรับแสงเองตลอด):
+     ภาพยังมืดแม้กล้องเปิดรับแสงเต็มที่ = ห้องมืดจริง (ราว 0–10 lux) · ภาพสว่างปกติ = บอกได้แค่ "สว่างกว่าราว 10 lux" ไม่แสดงตัวเลขที่เดาเอง */
 const LM = { busy: false, res: null, stream: null, vid: null };
-const LM_NOTE = "ค่าประมาณจากกล้องหน้า วางมือถือหงายจอขึ้น · ไม่บันทึกภาพ ปิดกล้องทันทีหลังวัด";
-const LM_DARK = 10; /* ต่ำกว่านี้กล้องที่ไม่บอกค่ารับแสงยังแยกระดับได้ */
+const LM_NOTE = "วางมือถือหงายจอขึ้นตรงที่นอน · ไม่บันทึกภาพ ปิดกล้องทันทีหลังวัด";
+const LM_DARK = 10, LM_N = 1.9, LM_C = 250; /* LM_DARK = ระดับที่กล้องทั่วไปเปิดรับแสงเต็มที่แล้ว (1/30 วิ ISO สูงสุด) */
 const srgbLin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+const hasExp = (set) => !!(set && set.exposureTime > 0 && set.iso > 0);
 function luxEstimate(meanLin, set) {
   const g = Math.max(meanLin, 1e-4) / 0.18;
-  if (set && set.exposureTime > 0 && set.iso > 0) { /* exposureTime ตามสเปก Image Capture = หน่วย 100 ไมโครวินาที */
+  if (hasExp(set)) { /* exposureTime ตามสเปก Image Capture = หน่วย 100 ไมโครวินาที */
     const t = set.exposureTime / 10000;
-    return { lux: (50 * 1.9 * 1.9) / (t * set.iso) * g, how: "exp", min: false };
+    return { lux: ((LM_C * LM_N * LM_N) / (t * set.iso)) * g, how: "exp", min: false, t, iso: set.iso };
   }
   if (meanLin >= 0.12) return { lux: LM_DARK, how: "img", min: true };
-  return { lux: LM_DARK * g, how: "img", min: false };
+  return { lux: Math.min(LM_DARK, LM_DARK * g), how: "img", min: false };
 }
 function luxText(r) {
-  if (r.min) return ["> " + LM_DARK, "lux โดยประมาณ"];
   const v = r.lux;
-  return [v < 0.5 ? "~0" : v < 2 ? "~1" : "~" + (v < 10 ? Math.round(v) : v < 100 ? Math.round(v / 5) * 5 : Math.round(v / 10) * 10), "lux โดยประมาณ"];
+  if (r.how === "img") { /* วิธี B แสดงเป็นช่วง ไม่ใช่ตัวเลข */
+    if (r.min) return ["สว่าง", `มากกว่าราว ${LM_DARK} lux`];
+    return v < 1 ? ["มืด", "ราว 0–1 lux"] : v < 4 ? ["มืด", "ราว 1–4 lux"] : ["สลัว", `ราว 4–${LM_DARK} lux`];
+  }
+  return [v < 0.5 ? "0" : v < 10 ? (Math.round(v * 2) / 2).toString() : String(v < 100 ? Math.round(v) : Math.round(v / 5) * 5), "lux"];
 }
-/* เทียบกับเป้าของช่วงนี้ (ค่าในแถว "แสง" ของหน้าคืนนี้) → ok | bright | dark */
+/* เทียบกับเป้าของช่วงนี้ (ค่าในแถว "แสง" ของหน้าคืนนี้) → ok | bright | dark · ช่วงพอดี = ครึ่งเท่าถึงเท่าครึ่งของเป้า (เป้า 0–1 lux = ไม่เกิน 1.5 lux) */
 function luxJudge(r, T) {
-  if (r.min) return T >= LM_DARK ? "ok" : "bright";
-  const hi = Math.max(T * 2, T + 1.5), lo = T * 0.5;
+  if (r.how === "img" && r.min) return T >= LM_DARK ? "ok" : "bright";
+  const hi = Math.max(T * 1.5, T + 1.5), lo = T * 0.5;
+  if (r.how === "img" && T >= LM_DARK) return "dark"; /* ภาพมืดจริงแต่เป้าสว่างกว่า 10 lux */
   return r.lux > hi ? "bright" : r.lux < lo && T >= 3 ? "dark" : "ok";
 }
 const luxPos = (v) => clamp(Math.log10(1 + v) / Math.log10(301), 0, 1); /* 0–300 lux แบบ log บนวงแหวน 300° */
@@ -1472,18 +1449,36 @@ function lmPaint() {
     $("#lm-res").textContent = tTxt; $("#lm-note").textContent = r.err; return;
   }
   const j = luxJudge(r, tg.lux), [v, u] = luxText(r);
-  lm.className = "lm " + j;
+  lm.className = "lm " + j + (r.how === "img" ? " band" : "");
   arc.style.strokeDasharray = `${(luxPos(r.lux) * 300 / 360 * 100).toFixed(1)} 100`;
   $("#lm-v").textContent = v; $("#lm-u").textContent = u;
-  const say = { ok: "ใกล้เคียงเป้าแล้ว", bright: tg.lux <= 1 ? "สว่างกว่าเป้า ปิดไฟ ปิดม่านทึบแสง หรือคว่ำจอที่เปิดอยู่" : "สว่างกว่าเป้า หรี่ไฟลงได้", dark: "มืดกว่าเป้า เพิ่มแสงได้ถ้าต้องการ" }[j];
+  const say = { ok: "ตรงกับเป้าแล้ว", bright: tg.lux <= 1 ? "สว่างกว่าเป้า ปิดไฟ ปิดม่านทึบแสง หรือคว่ำจอที่เปิดอยู่" : "สว่างกว่าเป้า หรี่ไฟลงได้", dark: "มืดกว่าเป้า เพิ่มแสงได้ถ้าต้องการ" }[j];
   $("#lm-res").innerHTML = `<b>${say}</b><span>${tTxt}</span>`;
-  $("#lm-note").textContent = r.how === "exp" ? LM_NOTE : r.min ? `${LM_NOTE} · กล้องเครื่องนี้ปรับแสงเอง บอกได้แค่ว่าสว่างกว่าราว ${LM_DARK} lux` : LM_NOTE;
+  $("#lm-note").textContent = r.how === "exp"
+    ? `คำนวณจากค่ากล้อง (ชัตเตอร์ 1/${Math.round(1 / r.t)} วิ · ISO ${Math.round(r.iso)}) ค่าประมาณ คลาดได้ราว ±50% · ${LM_NOTE}`
+    : `เบราว์เซอร์นี้ไม่บอกค่ากล้อง จึงวัดได้เป็นช่วง ถ้าต้องการตัวเลข lux เปิดด้วย Chrome บนมือถือ Android · ${LM_NOTE}`;
 }
 function lmReset() { LM.res = null; $("#lm-note").textContent = LM_NOTE; lmPaint(); }
 function lmStop() {
   if (LM.stream) LM.stream.getTracks().forEach((t) => t.stop());
   if (LM.vid) { LM.vid.srcObject = null; LM.vid.remove(); }
   LM.stream = null; LM.vid = null;
+}
+window.addEventListener("pagehide", lmStop);
+const lmWait = (ms) => new Promise((r) => setTimeout(r, ms));
+async function lmFrames(v, g, n, gap) { /* เฉลี่ยความสว่างเชิงเส้นของ n ภาพสุดท้าย */
+  const means = [];
+  for (let i = 0; i < n; i++) {
+    await lmWait(gap);
+    if (!LM.stream) throw new Error("closed");
+    if (!v.videoWidth) continue;
+    g.drawImage(v, 0, 0, 32, 24);
+    const d = g.getImageData(0, 0, 32, 24).data; let sum = 0;
+    for (let k = 0; k < d.length; k += 4) sum += 0.2126 * srgbLin(d[k]) + 0.7152 * srgbLin(d[k + 1]) + 0.0722 * srgbLin(d[k + 2]);
+    means.push(sum / (d.length / 4));
+  }
+  const last = means.slice(-3);
+  return last.length ? last.reduce((a, b) => a + b, 0) / last.length : null;
 }
 async function measureLight() {
   if (LM.busy) return;
@@ -1492,7 +1487,7 @@ async function measureLight() {
     LM.res = { err: "ลิงก์นี้หรือเบราว์เซอร์นี้เปิดกล้องไม่ได้ เปิดแอปจากเว็บของทีมเพื่อวัดแสง" }; return lmPaint();
   }
   LM.busy = true; LM.res = null;
-  $("#lm").className = "lm busy"; $("#lm-v").textContent = "กำลังวัด"; $("#lm-u").textContent = "ถือนิ่ง ๆ ราว 2 วินาที";
+  $("#lm").className = "lm busy"; $("#lm-v").textContent = "กำลังวัด"; $("#lm-u").textContent = "วางนิ่ง ๆ ราว 3 วินาที";
   $("#lm-note").textContent = "เปิดกล้องชั่วคราว ไม่แสดงและไม่บันทึกภาพ";
   try {
     LM.stream = await md.getUserMedia({ video: { facingMode: "user", width: { ideal: 320 }, height: { ideal: 240 } }, audio: false });
@@ -1503,20 +1498,21 @@ async function measureLight() {
     document.body.appendChild(v); v.srcObject = LM.stream;
     await v.play();
     const cv = document.createElement("canvas"); cv.width = 32; cv.height = 24;
-    const g = cv.getContext("2d", { willReadFrequently: true }), means = [];
-    for (let i = 0; i < 7; i++) { /* รอกล้องปรับแสงเองให้นิ่ง แล้วเฉลี่ย 3 ภาพสุดท้าย */
-      await new Promise((r) => setTimeout(r, 300));
-      if (!LM.stream) throw new Error("closed");
-      if (!v.videoWidth) continue;
-      g.drawImage(v, 0, 0, 32, 24);
-      const d = g.getImageData(0, 0, 32, 24).data; let sum = 0;
-      for (let k = 0; k < d.length; k += 4) sum += 0.2126 * srgbLin(d[k]) + 0.7152 * srgbLin(d[k + 1]) + 0.0722 * srgbLin(d[k + 2]);
-      means.push(sum / (d.length / 4));
+    const g = cv.getContext("2d", { willReadFrequently: true }), tr = LM.stream.getVideoTracks()[0];
+    const settings = () => (tr && tr.getSettings ? tr.getSettings() : {});
+    let m = await lmFrames(v, g, 6, 300), set = settings(); /* 1) กล้องวัดแสงเอง */
+    if (m == null) throw new Error("noframe");
+    const caps = tr && tr.getCapabilities ? tr.getCapabilities() : {};
+    if (hasExp(set) && caps.exposureMode && caps.exposureMode.includes("manual") && caps.exposureTime && tr.applyConstraints) {
+      /* 2) ล็อกชัตเตอร์ให้ภาพสว่างราวเทากลาง (ISO เดิม) แล้ววัดซ้ำ ไม่ให้กล้องปรับเองระหว่างอ่าน */
+      const want = clamp((set.exposureTime * 0.18) / Math.max(m, 1e-4), caps.exposureTime.min, caps.exposureTime.max);
+      try {
+        await tr.applyConstraints({ advanced: [{ exposureMode: "manual", exposureTime: want, iso: set.iso }] });
+        const m2 = await lmFrames(v, g, 3, 250), s2 = settings();
+        if (m2 != null && hasExp(s2) && m2 > 0.01 && m2 < 0.85) { m = m2; set = s2; }
+      } catch (e) { /* ล็อกไม่ได้ ใช้ค่าที่กล้องวัดเอง */ }
     }
-    const tr = LM.stream.getVideoTracks()[0], set = tr && tr.getSettings ? tr.getSettings() : {};
     lmStop();
-    if (!means.length) throw new Error("noframe");
-    const last = means.slice(-3), m = last.reduce((a, b) => a + b, 0) / last.length;
     LM.res = luxEstimate(m, set); LM.res.mean = m;
   } catch (e) {
     lmStop();
@@ -1771,193 +1767,28 @@ document.addEventListener("visibilitychange", async () => { /* จอกลั�
 });
 window.addEventListener("pagehide", () => stopMonitor()); /* ปิดแท็บหรือออกจากหน้า = ปิดไมค์ */
 
-/* ---------- ป้ายสายชาร์จในโหมดหลับ (v9) ----------
-   ไม่ได้เสียบ = แดงหม่น · เสียบแล้ว = เขียวเซจ · อัปเดตเองเมื่อเสียบ/ถอด (navigator.getBattery + chargingchange มีใน Chrome/Android/คอม)
-   อ่านไม่ได้ (iPhone, Safari, Firefox) = ไม่เดาว่าเสียบแล้ว: แดง "ยังไม่รู้ว่าเสียบสายชาร์จหรือยัง" + ปุ่ม "เสียบแล้ว" ให้ยืนยันเอง → เขียว "คุณยืนยันว่า…" */
-const BATT = { b: null, asked: false, user: false };
+/* ---------- ป้ายสายชาร์จในโหมดหลับ (v9.1 · ตรวจอัตโนมัติอย่างเดียว ไม่มีปุ่มกดยืนยันเอง) ----------
+   เบราว์เซอร์ที่บอกสถานะแบต (navigator.getBattery: Chrome/Edge/Samsung บน Android, Windows, Mac): ไม่ได้เสียบ = แดงหม่น · เสียบแล้ว = เขียวเซจ
+   เปลี่ยนเองทันทีเมื่อเสียบ/ถอด (chargingchange) และตรวจซ้ำทุก 30 วินาทีกันเหตุการณ์หลุด
+   Safari (iPhone/iPad/Mac) และ Firefox ไม่บอกสถานะแบตให้เว็บเลย → ไม่เดาว่าเสียบหรือไม่: ป้ายสีกลางเตือนให้เสียบ + บอกว่าเปิดด้วย Chrome จะตรวจให้อัตโนมัติ */
+const BATT = { b: null, asked: false, iv: 0 };
 async function checkBattery() {
   if (!BATT.asked) {
     BATT.asked = true;
     try { BATT.b = navigator.getBattery ? await navigator.getBattery() : null; } catch (e) { BATT.b = null; }
     if (BATT.b) { BATT.b.addEventListener("chargingchange", battShow); BATT.b.addEventListener("levelchange", battShow); }
   }
+  clearInterval(BATT.iv); if (BATT.b) BATT.iv = setInterval(() => (sleepOn() ? battShow() : clearInterval(BATT.iv)), 30000);
   battShow();
 }
 function battShow() {
   const el = $("#batt"), b = BATT.b;
   if (!sleepOn()) { el.className = "batt"; el.innerHTML = ""; return; }
-  const pct = b ? Math.round(b.level * 100) : 0, use = MON.on && !MON.paused ? "การฟังเสียงใช้แบตทั้งคืน" : "เปิดแอปค้างไว้ทั้งคืนใช้แบตมาก";
-  let cls, msg, btn = "";
-  if (b) [cls, msg] = b.charging ? ["batt ok", `เสียบสายชาร์จแล้ว · แบต ${pct}%`] : ["batt bad", `ยังไม่ได้เสียบสายชาร์จ · แบต ${pct}% · ${use}`];
-  else if (BATT.user) { [cls, msg] = ["batt ok", "คุณยืนยันว่าเสียบสายชาร์จแล้ว"]; btn = `<button class="batt-b" type="button" id="batt-no">ยังไม่ได้เสียบ</button>`; }
-  else { [cls, msg] = ["batt bad", `ยังไม่รู้ว่าเสียบสายชาร์จหรือยัง · ${use}`]; btn = `<button class="batt-b" type="button" id="batt-yes">เสียบแล้ว</button>`; }
-  el.className = cls; el.innerHTML = ico("i-batt") + `<span>${msg}</span>` + btn;
+  const pct = b ? Math.round(b.level * 100) : 0;
+  const [cls, msg] = !b ? ["batt", "เสียบสายชาร์จไว้ทั้งคืน · เบราว์เซอร์นี้ไม่บอกสถานะชาร์จ เปิดด้วย Chrome จะตรวจให้อัตโนมัติ"]
+    : b.charging ? ["batt ok", `เสียบสายชาร์จแล้ว · แบต ${pct}%`] : ["batt bad", `ยังไม่ได้เสียบสายชาร์จ · แบต ${pct}% · การฟังเสียงใช้แบตทั้งคืน`];
+  el.className = cls; el.innerHTML = ico("i-batt") + `<span>${msg}</span>`;
 }
-
-/* ---------- เสียงช่วยหลับ (v9) ----------
-   สร้างเสียงเองทั้งหมดด้วย Web Audio ในเครื่อง ไม่มีไฟล์เพลง ไม่โหลดจากเว็บนอก ไม่มีลิขสิทธิ์ใคร
-   เริ่มเล่นหลังผู้ใช้แตะเท่านั้น (iPhone ไม่ให้เปิดเสียงเอง) · ค่าเริ่ม = แถว "เสียง" ของช่วงหลับลึก
-   ออกแบบไม่ให้ตัวจับกรนนับผิด: เสียงคงที่ (Brown/Pink) = พื้นห้อง · ฝน = เม็ดฝนสั้นและแหลม · คลื่น/ขันทิเบต = ดังนานกว่า 3.5 วินาที และไม่เป็นจังหวะหายใจ
-   · เพลง = แผ่นเสียงคอร์ดต่อเนื่อง ทำนองเบากว่าพื้น ไม่มีช่วงเงียบ · ทดสอบด้วย node tools/test_music.js */
-/* SLEEP-SND-BEGIN — ใช้ได้ทั้ง AudioContext และ OfflineAudioContext (tools/test_music.js เรนเดอร์ไปทดสอบกับตัวจับกรน) */
-const SND_TYPES = ["brown", "pink", "rain", "ocean", "bath", "music"];
-function sleepSound(ctx, type, out, seed0) {
-  const SR = ctx.sampleRate, t0 = ctx.currentTime, nodes = [];
-  let seed = seed0 || 20261115; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, nz = () => rnd() * 2 - 1;
-  const keep = (n) => (nodes.push(n), n);
-  function noiseBuf(kind, secs) { /* วนซ้ำ 9 วินาที ไม่ได้ยินรอยต่อ (ค่อย ๆ จางเข้าหากันที่ปลาย) */
-    const n = Math.round(SR * secs), buf = ctx.createBuffer(1, n, SR), a = buf.getChannelData(0);
-    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0, br = 0;
-    for (let i = 0; i < n; i++) {
-      const w = nz();
-      if (kind === "brown") { br = (br + 0.02 * w) / 1.02; a[i] = br * 3.5; }
-      else { b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.969 * b2 + w * 0.153852; b3 = 0.8665 * b3 + w * 0.3104856; b4 = 0.55 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.016898; a[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926; }
-    }
-    const f = Math.round(SR * 0.5); for (let i = 0; i < f; i++) { const k = i / f; a[i] = a[i] * k + a[n - f + i] * (1 - k); }
-    const out2 = ctx.createBuffer(1, n - f, SR); out2.getChannelData(0).set(a.subarray(0, n - f)); return out2;
-  }
-  function loop(buf, dest, gain) { const src = keep(ctx.createBufferSource()); src.buffer = buf; src.loop = true; const g = ctx.createGain(); g.gain.value = gain; src.connect(g).connect(dest); src.start(t0); return g; }
-  const filt = (kind, f, q) => { const b = ctx.createBiquadFilter(); b.type = kind; b.frequency.value = f; if (q) b.Q.value = q; return b; };
-  let next = t0, sched = () => {};
-  if (type === "brown") loop(noiseBuf("brown", 9), out, 0.9);
-  else if (type === "pink") loop(noiseBuf("pink", 9), out, 0.55);
-  else if (type === "rain") {
-    const lp = filt("lowpass", 5200), hp = filt("highpass", 350); hp.connect(lp).connect(out);
-    loop(noiseBuf("pink", 9), hp, 0.7);
-    loop(noiseBuf("brown", 7), out, 0.25); /* ฝนตกไกล ๆ เสียงทุ้มต่ำเบา ๆ */
-    /* เม็ดฝน: เสียงคลิกสั้น 5–20 มิลลิวินาที ช่วง 2–6 kHz สุ่มทั้งเวลาและความดัง ไม่เป็นจังหวะ */
-    const n = Math.round(SR * 6), buf = ctx.createBuffer(1, n, SR), a = buf.getChannelData(0);
-    for (let k = 0; k < 260; k++) { const i0 = Math.floor(rnd() * (n - SR * 0.03)), len = Math.round(SR * (0.005 + rnd() * 0.015)), amp = 0.08 + rnd() * rnd() * 0.5; for (let i = 0; i < len; i++) a[i0 + i] += nz() * amp * Math.exp((-5 * i) / len); }
-    const bp = filt("bandpass", 3600, 0.8); bp.connect(out); loop(buf, bp, 0.9);
-  } else if (type === "ocean") {
-    /* คลื่น: เสียงซ่าทุ้มที่ค่อย ๆ ดังขึ้น 4–5 วินาที แล้วถอยลง 5–7 วินาที รอบละ 10–14 วินาที · ความดังแกว่งแค่ราว 2–3 dB ได้ยินเป็นคลื่นจากสีเสียงที่สว่างขึ้น-ทุ้มลง
-       (v9 ทดสอบ: แกว่ง 6 dB เกินเกณฑ์เริ่มนับของตัวจับกรน 5 dB ยอดคลื่นจึงกลืนเสียงกรน นับได้ 12/30 ครั้ง) */
-    const lp = filt("lowpass", 800, 0.5), g = ctx.createGain(); g.gain.value = 0.78; lp.connect(g).connect(out);
-    loop(noiseBuf("brown", 9), lp, 0.8); loop(noiseBuf("pink", 8), lp, 0.45);
-    sched = (until) => {
-      for (; next < until; ) {
-        const up = 4 + rnd(), down = 5.5 + rnd() * 2, top = 0.97 + rnd() * 0.06;
-        g.gain.setTargetAtTime(top, next, up / 3); lp.frequency.setTargetAtTime(1500, next, up / 3);
-        g.gain.setTargetAtTime(0.78, next + up, down / 3); lp.frequency.setTargetAtTime(800, next + up, down / 3);
-        next += up + down + rnd() * 1.5;
-      }
-    };
-  } else if (type === "bath") {
-    /* Sound bath: พื้นเสียงทุ้มต่อเนื่อง + ขันทิเบตลูบให้ดังขึ้นช้า 1.2 วินาที แล้วก้องยาว 14–22 วินาที ทุก 9–17 วินาที (สุ่ม ไม่เป็นจังหวะหายใจ) */
-    const lp = filt("lowpass", 420); lp.connect(out); loop(noiseBuf("brown", 9), lp, 0.5);
-    const bus = ctx.createGain(); bus.gain.value = 0.12; bus.connect(out);
-    const F = [146.8, 174.6, 196, 220, 261.6, 293.7];
-    const drone = [F[0], F[0] * 1.5].map((f) => { const o = keep(ctx.createOscillator()); o.frequency.value = f; const g = ctx.createGain(); g.gain.value = 0.25; o.connect(g).connect(bus); o.start(t0); return o; });
-    void drone;
-    sched = (until) => {
-      for (; next < until; ) {
-        const f = F[Math.floor(rnd() * F.length)], dec = 14 + rnd() * 8, pk = 0.55 + rnd() * 0.3;
-        [[1, 1], [2.76, 0.45], [5.4, 0.18], [8.9, 0.07]].forEach(([m, amp], k) => {
-          [0, 0.6 + k * 0.4].forEach((det, j) => { /* คู่ที่เพี้ยนกันเล็กน้อย = เสียงหึ่งวนของขัน */
-            const o = keep(ctx.createOscillator()), g = ctx.createGain(); o.frequency.value = f * m + det;
-            g.gain.setValueAtTime(0, next); g.gain.linearRampToValueAtTime(pk * amp * 0.5, next + 1.2); g.gain.setTargetAtTime(0, next + 1.2, dec / (3 + k));
-            o.connect(g).connect(bus); o.start(next); o.stop(next + 1.2 + dec * 1.2);
-          });
-        });
-        next += 9 + rnd() * 8;
-      }
-    };
-  } else if (type === "music") {
-    /* เพลงบรรเลงช้า: แผ่นคอร์ด 4 คอร์ดเปลี่ยนทุก 8 วินาทีแบบไขว้กัน ไม่มีช่วงเงียบ + ทำนองโน้ตเพนทาโทนิกเบา ๆ
-       ผ่านตัวคุมระดับ (compressor) ให้ความดังนิ่ง: v9 ทดสอบรุ่นแรกขึ้นลง 3.7 dB เกินเกณฑ์จบเสียง 3 dB ของตัวจับกรน เสียงกรนจึงยืดยาวจนถูกตัดทิ้ง (ไมค์ปลอมนับได้ 5/11) */
-    const lp = filt("lowpass", 1400, 0.4), comp = ctx.createDynamicsCompressor(), bus = ctx.createGain();
-    comp.threshold.value = -38; comp.knee.value = 6; comp.ratio.value = 8; comp.attack.value = 0.4; comp.release.value = 2.5;
-    bus.gain.value = 0.5; lp.connect(comp).connect(bus).connect(out);
-    loop(noiseBuf("pink", 9), out, 0.06); /* ลมเบา ๆ กลบเสียงเงียบระหว่างคอร์ด */
-    const CH = [[130.8, 196, 261.6, 329.6], [110, 164.8, 220, 261.6], [87.3, 130.8, 174.6, 220], [98, 146.8, 196, 246.9]];
-    const MEL = [392, 440, 523.3, 587.3, 659.3];
-    let ci = 0;
-    sched = (until) => {
-      for (; next < until; ) {
-        CH[ci++ % 4].forEach((f) => ["sine", "triangle"].forEach((w, j) => {
-          const o = keep(ctx.createOscillator()), g = ctx.createGain(); o.type = w; o.frequency.value = f * (j ? 1.003 : 1);
-          g.gain.setValueAtTime(0, next); g.gain.linearRampToValueAtTime(j ? 0.12 : 0.22, next + 3); g.gain.setValueAtTime(j ? 0.12 : 0.22, next + 8); g.gain.linearRampToValueAtTime(0, next + 11);
-          o.connect(g).connect(lp); o.start(next); o.stop(next + 11.2);
-        }));
-        for (let k = 0; k < 2; k++) if (rnd() < 0.7) { /* ทำนอง 0–2 โน้ตต่อคอร์ด เวลาสุ่ม */
-          const at = next + 1 + rnd() * 6, o = keep(ctx.createOscillator()), g = ctx.createGain(); o.frequency.value = MEL[Math.floor(rnd() * MEL.length)];
-          g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.03, at + 0.8); g.gain.setTargetAtTime(0, at + 0.8, 1.5);
-          o.connect(g).connect(lp); o.start(at); o.stop(at + 8);
-        }
-        next += 8;
-      }
-    };
-  }
-  sched(t0 + 20);
-  return {
-    sched: (aheadSec) => sched(ctx.currentTime + (aheadSec || 20)),
-    stop() { nodes.forEach((n) => { try { n.stop(); } catch (e) { /* ยังไม่เริ่ม */ } }); nodes.length = 0; },
-  };
-}
-/* SLEEP-SND-END */
-const SND = {
-  brown: { th: "Brown noise", d: "ทุ้มต่ำ" }, pink: { th: "Pink noise", d: "นุ่ม" }, rain: { th: "ฝนพรำ", d: "" }, ocean: { th: "คลื่นทะเล", d: "" },
-  bath: { th: "Sound bath", d: "ขันทิเบต" }, music: { th: "เพลงบรรเลง", d: "ช้า" },
-};
-const MUS = { ctx: null, gen: null, master: null, type: "brown", vol: 60, timer: "all", on: false, endAt: 0, iv: 0, tT: 0 };
-const musGain = (v) => Math.pow(v / 100, 2) * 0.6;
-const dbToVol = (db) => clamp(Math.round(25 + (db - 30) * 2.2), 15, 90); /* 30 dB(A) → 25 · 45 → 58 · 55 → 80 (ความดังจริงขึ้นกับลำโพงและระยะ) */
-function musInit() { /* เปิดโหมดหลับ: ตั้งค่าเริ่มตามแถว "เสียง" ของช่วงนี้ ยังไม่เล่นจนกว่าจะแตะ */
-  musStop();
-  const s = S.sound;
-  MUS.type = SND[s.type] ? s.type : "brown"; MUS.vol = dbToVol(s.type === "quiet" ? 40 : s.db); MUS.timer = s.timer || "all";
-  MUS.fromRoom = SND[s.type] ? `${SND[s.type].th} ${s.db} dB(A)` : "";
-  $("#mus-vol").value = MUS.vol; setFill($("#mus-vol"));
-  $("#mus-ch").innerHTML = SND_TYPES.map((k) => `<button class="mus-c" type="button" data-mus="${k}" aria-pressed="${k === MUS.type}">${SND[k].th}</button>`).join("");
-  $("#mus-tm").innerHTML = [["30", "30 นาที"], ["60", "1 ชม."], ["all", "ทั้งคืน"]].map(([k, l]) => `<button type="button" data-mtm="${k}" aria-pressed="${k === MUS.timer}">${l}</button>`).join("");
-  musUI();
-}
-function musUI() {
-  $$("#mus-ch .mus-c").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mus === MUS.type)));
-  $$("#mus-tm button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mtm === MUS.timer)));
-  const p = $("#mus-play"); p.setAttribute("aria-pressed", String(MUS.on));
-  p.innerHTML = ico(MUS.on ? "i-pause" : "i-play") + `<span>${MUS.on ? "หยุดเสียง" : "เปิด " + SND[MUS.type].th}</span>`;
-  $("#mus").classList.toggle("on", MUS.on);
-  const left = MUS.on && MUS.endAt ? Math.max(0, Math.ceil((MUS.endAt - Date.now()) / 60000)) : 0;
-  $("#mus-st").textContent = MUS.on ? `${SND[MUS.type].th} · ${MUS.endAt ? `ปิดเองในอีก ${left} นาที` : "เล่นทั้งคืน"}` : MUS.ended ? "ปิดเองตามเวลาแล้ว" : MUS.fromRoom && MUS.type === S.sound.type ? `ห้องตั้งไว้ ${MUS.fromRoom}` : "ยังไม่เปิด";
-}
-function musRamp() { /* ระดับเสียง + ค่อย ๆ เบาลง: ดังเต็มครึ่งแรก แล้วเบาลงช้า ๆ ครึ่งหลังจนปิด */
-  if (!MUS.master) return;
-  const g = MUS.master.gain, now = MUS.ctx.currentTime, v = musGain(MUS.vol);
-  g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(v, now + 0.6);
-  if (MUS.endAt) {
-    const rest = (MUS.endAt - Date.now()) / 1000, fade = (+MUS.timer * 60) / 2;
-    if (rest <= 1) return musStop(true);
-    if (rest > fade) g.setValueAtTime(v, now + rest - fade);
-    else { const at = v * Math.pow(0.0005 / v, 1 - rest / fade); g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(at, now + 0.6); } /* ปรับระหว่างกำลังเบาลง: ต่อจากระดับที่ควรเป็นตอนนี้ */
-    g.exponentialRampToValueAtTime(0.0005, now + rest);
-    clearTimeout(MUS.tT); MUS.tT = setTimeout(() => musStop(true), rest * 1000 + 200);
-  }
-}
-async function musPlay() {
-  musStop();
-  const AC = window.AudioContext || window.webkitAudioContext;
-  if (!AC) { $("#mus-st").textContent = "เบราว์เซอร์นี้เล่นเสียงไม่ได้"; return; }
-  let ctx;
-  try { ctx = new AC(); } catch (e) { $("#mus-st").textContent = "เปิดเสียงไม่ได้"; return; }
-  const master = ctx.createGain(); master.gain.value = 0.0001; master.connect(ctx.destination);
-  Object.assign(MUS, { ctx, master, on: true, ended: false, endAt: MUS.timer === "all" ? 0 : Date.now() + +MUS.timer * 60000 });
-  MUS.gen = sleepSound(ctx, MUS.type, master, (Date.now() % 100000) + 1);
-  if (ctx.state === "suspended") ctx.resume().catch(() => {});
-  musRamp();
-  MUS.iv = setInterval(() => { if (MUS.gen) MUS.gen.sched(25); musUI(); }, 10000);
-  musUI();
-}
-function musStop(ended) {
-  clearInterval(MUS.iv); clearTimeout(MUS.tT);
-  if (MUS.gen) MUS.gen.stop();
-  if (MUS.ctx) MUS.ctx.close().catch(() => {});
-  Object.assign(MUS, { ctx: null, gen: null, master: null, on: false, endAt: 0, ended: !!ended });
-  if ($("#mus-play")) musUI();
-}
-function musPick(type) { MUS.type = type; return musPlay(); } /* แตะชื่อเสียง = เล่นเสียงนั้นเลย */
-function musTimer(k) { MUS.timer = k; if (MUS.on) { MUS.endAt = k === "all" ? 0 : Date.now() + +k * 60000; musRamp(); } musUI(); }
-window.addEventListener("pagehide", () => { musStop(); lmStop(); });
 
 let toastT = 0;
 function toast(msg) {
@@ -2353,7 +2184,6 @@ document.addEventListener("input", (e) => {
     case "s-inc": S.bed.incline = v; setOver("incline", v); break;
     case "preset-in": $("#preset-err").textContent = ""; return;
     case "save-name": $("#save-err").textContent = ""; return;
-    case "mus-vol": MUS.vol = v; setFill(el); return musRamp();
     default: return;
   }
   setFill(el); live();
@@ -2386,8 +2216,6 @@ document.addEventListener("click", (e) => {
   if (d.ab) { S.ab = d.ab; pressIn(t); return renderRoutine(); }
   if (d.ex) { $("#preset-in").value = d.ex; $("#preset-err").textContent = ""; return; }
   if (d.date) return pressIn(t);
-  if (d.mus) return musPick(d.mus);
-  if (d.mtm) return musTimer(d.mtm);
   if (t.classList.contains("sw")) return toggleSw(t);
   switch (t.id) {
     case "preset-tag": return openSheet("preset");
@@ -2396,9 +2224,6 @@ document.addEventListener("click", (e) => {
     case "mon-t": return monToggle();
     case "lm-go": return measureLight();
     case "lm-adj": return lmAdjust();
-    case "mus-play": return MUS.on ? musStop() : musPlay();
-    case "batt-yes": BATT.user = true; return battShow();
-    case "batt-no": BATT.user = false; return battShow();
     case "sleep-back": endSleep(); return applyPhase("pre");
     case "save-room": return openSave("room");
     case "save-report": return openSave("report");
