@@ -1,4 +1,10 @@
-<!doctype html><html lang="th"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" href="icon.svg" type="image/svg+xml"></head><body>
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="icon.svg" type="image/svg+xml"></head>
+<body>
 <title>KUENDEE Sleep Lab</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#101d38">
@@ -428,6 +434,16 @@ body.day .err{color:var(--earth)}
 .sn-line .off{fill:none;stroke:var(--line-2);stroke-dasharray:2 3}
 .sn-line .hit{fill:var(--earth)}
 .sn-short{margin-top:10px;font-size:13px;color:var(--accent)}
+/* v8 กล่องคำเตือนพบแพทย์ (สี Earth จาก CI · ไม่ใช้อีโมจิ) · กลางคืนใช้ earth-hi ให้อ่านออกบนพื้นเข้ม แบบเดียวกับ .err */
+.sn-alert{margin-top:12px;padding:12px 14px 12px 15px;border-radius:12px;border:1px solid rgba(156,83,48,.38);border-left:4px solid var(--earth);background:rgba(156,83,48,.10);font-size:13.5px;line-height:1.6;color:var(--fg-2);overflow-wrap:anywhere}
+.sn-alert[hidden]{display:none}
+.sn-alert b{display:block;margin-bottom:3px;font-size:15px;font-weight:500;line-height:1.45;color:var(--earth-hi)}
+.sn-alert small{display:block;margin-top:7px;font-size:12px;line-height:1.5;color:var(--fg-3)}
+.sn-alert.lv3{background:rgba(156,83,48,.16);border-color:rgba(156,83,48,.6);border-left-color:var(--earth)}
+body.day .sn-alert b{color:var(--earth)}
+.rec-alert{font-size:13px;line-height:1.5;padding:8px 12px;border-radius:12px;border-left:3px solid var(--earth);background:rgba(156,83,48,.10);color:var(--earth-hi);overflow-wrap:anywhere}
+.rec-alert.lv3{background:rgba(156,83,48,.16)}
+body.day .rec-alert{color:var(--earth)}
 .sc-adj{font-size:12.5px;line-height:1.55;color:var(--fg-3);text-align:left;width:100%}
 .sc-adj b{color:var(--accent);font-weight:400}
 .rec-sn{display:flex;gap:8px;align-items:baseline;font-size:13.5px;color:var(--fg-2);padding:9px 12px;border-radius:12px;background:var(--card-2);overflow-wrap:anywhere}
@@ -730,6 +746,7 @@ body.day .err{color:var(--earth)}
             <div class="card-h"><h3>เสียงกรน</h3><small id="sn-src">ข้อมูลตัวอย่าง</small></div>
             <div class="sn-stats" id="sn-stats"></div>
             <div class="sn-line" id="sn-line" role="img"></div>
+            <div class="sn-alert" id="sn-alert" role="note" hidden></div>
             <p class="sn-tip" id="sn-tip"></p>
           </div>
           <div class="insight"><div class="ic"><svg class="i" aria-hidden="true"><use href="#i-temp"/></svg></div><div><h3>หลับลึกดีที่สุดตอนห้อง 24°C</h3><p>หลับลึก 60 จาก 81 นาทีเกิดก่อน 02:00 ที่บ้านตั้งแอร์ 24°C แล้วให้ขึ้นเองช่วงดึก</p></div></div>
@@ -1341,33 +1358,94 @@ function wakeUp() {
    ไมค์จริงเมื่อเบราว์เซอร์ให้สิทธิ์ (เว็บ https หรือ localhost) · ใช้ไมค์ไม่ได้ (ลิงก์ claude.ai, ไม่อนุญาต) = ข้อมูลตัวอย่าง มีป้ายบอกเสมอ
    วิเคราะห์เฉพาะระดับเสียงในเครื่อง ไม่อัด ไม่เก็บ และไม่ส่งเสียงไปไหน เก็บแค่ตัวเลข · dB เป็นค่าประมาณ (ไมค์มือถือไม่ได้สอบเทียบ: dBFS + 94) */
 /* SNORE-DET-BEGIN — ฟังก์ชันล้วน ไม่แตะหน้าเว็บ ทดสอบด้วย node tools/test_snore.js
-   เสียงกรน = ดังกว่าพื้นเสียงห้อง 7 dB ขึ้นไป · เสียงทุ้ม (พลังงาน 60–500 Hz มากกว่า 500–4000 Hz) · ยาว 0.3–3.5 วินาที
-   และมาเป็นจังหวะหายใจ (ห่างกัน 2–9 วินาที) ติดกันอย่างน้อย 3 ครั้ง · ห่างจากครั้งก่อนเกิน 60 วินาที = เริ่มช่วงกรนใหม่
-   เสียงสม่ำเสมอ (แอร์ Brown noise) = พื้นเสียงห้อง ไม่นับ · เสียงดังครั้งเดียว (ประตู รถ) = ไม่เป็นจังหวะ ไม่นับ */
+   v8 (14 พ.ย. 2569) จูนตามงานวิจัย ค่าทุกตัวอยู่ใน SNORE_CFG ที่เดียว · แหล่งอ้างอิงเต็มอยู่ใน README หัวข้อ v8 (บนจอแอปไม่แสดงชื่องานวิจัย)
+   เสียงกรน = ดังขึ้นจากพื้นห้อง · ยาวราวช่วงหายใจเข้า · พลังงานส่วนใหญ่อยู่ช่วงความถี่ต่ำ · มาเป็นจังหวะหายใจที่สม่ำเสมอ ติดกันอย่างน้อย 3 ครั้ง
+   ไม่นับ: เสียงสม่ำเสมอ (แอร์ พัดลม Brown noise = พื้นห้อง) · เสียงกระแทก/ไอ (ดังสุดทันทีที่เริ่มแล้วจบเร็ว) · เสียงพูด (ดังขึ้นลงเป็นพยางค์ ไม่เป็นจังหวะหายใจ)
+   อาจหยุดหายใจ = ระหว่างกรนเป็นจังหวะ เงียบ ≥ 10 วินาที แล้วมีเสียงเฮือกดังกว่ากรนปกติของคืนนั้นชัดเจน และกลับมากรนต่อภายใน 15 วินาที
+   เป็นการคัดกรองจากเสียงเท่านั้น: ไมค์มือถือไม่ได้สอบเทียบ (dB ประมาณ) และไม่เห็นการหายใจแผ่ว (hypopnea) หรือหยุดหายใจที่ไม่มีเสียง */
+const SNORE_CFG = {
+  MERGE_S: 0.3,               /* เบาลงสั้นกว่า 0.3 วินาทีแล้วดังต่อ = เสียงเดียวกัน (ช่องว่างระหว่างพยางค์คำพูด) · ระหว่างกรนแต่ละครั้งเงียบนานกว่านี้มาก */
+  START_DB: 5, END_DB: 3,      /* เริ่มเสียงเมื่อดังกว่าพื้นห้อง ≥ 5 dB จบเมื่อต่ำกว่าพื้น + 3 (เดิม 7/4 ทำให้กรนเบาที่ยังเป็นจังหวะหลุด) ใช้จังหวะ+ความถี่กันเสียงสุ่มแทน */
+  FLOOR_Q: 0.2,                /* พื้นห้อง = ระดับที่ 20% ของเวลาเงียบกว่านี้ (quantile) กรนกินเวลาได้ถึง 80% โดยพื้นไม่ลอยตาม · เสียงค้างนาน (เปิดพัดลม) = ไล่ตามเร็วขึ้น */
+  MIN_S: 0.3, MAX_S: 3.5,      /* ยาวต่อครั้ง ≈ ช่วงหายใจเข้า (Pevernagie 2010) */
+  GAP_MIN: 2.5, GAP_MAX: 10,   /* ห่างกันตามอัตราหายใจขณะหลับของผู้ใหญ่ ราว 6–24 ครั้ง/นาที (เดิม 2–9 วินาที) */
+  GAP_JUMP: 2,                 /* ช่วงห่างครั้งใหม่ต่างจากครั้งก่อนไม่เกิน 2 เท่า (หายใจขณะหลับค่อนข้างสม่ำเสมอ) กันเสียงที่บังเอิญห่างพอดี */
+  RUN_MIN: 3, EPISODE_GAP: 60, /* ติดกัน ≥ 3 ครั้ง · เว้นเกิน 60 วินาที = ช่วงกรนใหม่ */
+  LOW_HZ: [60, 2000], HIGH_HZ: [2000, 5000], RATIO_MIN: 1.5,
+  /* พลังงานกรนส่วนใหญ่อยู่ต่ำกว่า ~2 kHz: กรนเพดานอ่อนยอดราว 100–200 Hz กรนโคนลิ้นยอดราว 1.2 kHz (Agrawal 2002; Pevernagie 2010)
+     เดิมแบ่งที่ 500 Hz (ต้องให้ช่วง 60–500 มากกว่า 500–4000) ทำให้กรนโคนลิ้น (พบบ่อยในคนที่หยุดหายใจ) หลุด
+     เกณฑ์นี้กันเสียงซ่าแหลม (ผ้าเสียดสี ลมพ่น) · เสียงพูดผ่านเกณฑ์ความถี่ได้ จึงกันด้วยจังหวะและพยางค์แทน */
+  IMPULSE_S: 0.1, IMPULSE_MAX_S: 0.8, /* ดังสุดภายใน 0.1 วินาทีแรก และสั้นกว่า 0.8 วินาที = เสียงกระแทก/ไอ (กรนค่อย ๆ ดังขึ้นตามลมหายใจเข้า) */
+  DIP_DB: 6, SPEECH_DIPS: 2, SPEECH_RATE: 2, /* ในเสียงเดียวเบาลงแล้วดังขึ้น ≥ 6 dB ตั้งแต่ 2 ครั้ง และถี่ ≥ 2 ครั้ง/วินาที = พยางค์คำพูด (พูดราว 4–5 พยางค์/วินาที) · กรนบางครั้งมีหลายยอดแต่ไม่ถี่ขนาดนั้น */
+  LOUD_DB: 60,                 /* กรนดัง ≈ ดังกว่าเสียงพูดคุย (นิยาม "กรนดัง" ของ STOP-Bang) · ค่าประมาณจากไมค์มือถือ */
+  PAUSE_S: 10, PAUSE_MAX_S: 120, /* หยุดหายใจ = ลมหยุด ≥ 10 วินาที (AASM) · เงียบเกิน 2 นาที = น่าจะเลิกกรนเฉย ๆ ไม่นับ */
+  GASP_DB: 4, GASP_MIN_S: 0.2, GASP_MAX_S: 4, RESUME_S: 15,
+  /* เสียงหลังหยุดหายใจดังกว่ากรนปกติ (Pevernagie 2010) งานวิจัยไม่ได้ให้ตัวเลขตายตัว จึงตั้ง ≥ 4 dB เหนือกรนกลางของคืนนั้น และต้องกลับมากรนภายใน 15 วินาที */
+  MIN_LISTEN: 30, ALERT_MIN_LISTEN: 120, /* ฟังไม่ถึง 30 นาที = ยังไม่สรุป · เตือนระดับ 3 ต้องฟัง ≥ 2 ชั่วโมง (ใกล้ขั้นต่ำของเครื่องตรวจการนอนที่บ้าน) */
+  OFTEN_FRAC: 0.1,             /* กรน ≥ 10% ของเวลาที่ฟัง = กรนบ่อย (ค่าตั้งของแอป ไม่มีเกณฑ์สากล) */
+  PAUSE_PER_H: 5, PAUSE_MIN_N: 10, /* ≥ 5 ครั้ง/ชม. = เกณฑ์ต่ำสุดที่ AASM ถือว่าผิดปกติ (AHI ≥ 5) และต้องพบอย่างน้อย 10 ครั้ง */
+};
 function snoreDet() {
-  const d = { floor: 0, burst: null, rb: [], run: 0, count: 0, eps: 0, lastSn: -1e9, snMax: 0 };
-  /* t = วินาทีนับจากเริ่ม · db = ระดับเสียง · ratio = เสียงทุ้ม/เสียงแหลม · เรียกราว 10 ครั้งต่อวินาที · คืนรายการครั้งที่เพิ่งยืนยันว่าเป็นกรน */
-  d.push = (t, db, ratio) => {
-    d.floor = !d.floor ? db : db < d.floor ? d.floor * 0.8 + db * 0.2 : d.floor + 0.01;
-    const b = d.burst;
-    if (!b) { if (db > d.floor + 7 && ratio > 1.2) d.burst = { t, pk: db }; return []; }
-    b.pk = Math.max(b.pk, db);
-    if (db >= d.floor + 4) return [];
-    d.burst = null;
-    const dur = t - b.t;
-    if (dur < 0.3 || dur > 3.5) { d.run = 0; d.rb = []; return []; }
-    const prev = d.rb[d.rb.length - 1], gap = prev ? b.t - prev.t : 99;
-    d.run = gap >= 2 && gap <= 9 ? d.run + 1 : 1;
+  const C = SNORE_CFG;
+  const d = { floor: 0, burst: null, rb: [], run: 0, count: 0, eps: 0, lastSn: -1e9, snMax: 0, loud: 0, snLvl: 0, lastB: null, pend: null, pauses: 0 };
+  const impulse = (b) => b.tp - b.t <= C.IMPULSE_S && b.dur <= C.IMPULSE_MAX_S;
+  const speechy = (b) => b.dips >= C.SPEECH_DIPS && b.dips / b.dur >= C.SPEECH_RATE;
+  const snoreLike = (b) => b.dur >= C.MIN_S && b.dur <= C.MAX_S && b.rs / b.n >= C.RATIO_MIN && !impulse(b) && !speechy(b);
+  /* เสียงหนึ่งจบ: ตรวจเสียงเฮือกหลังเงียบ → ยืนยันเมื่อกลับมากรน → ต่อจังหวะกรน · คืนรายการครั้งที่เพิ่งยืนยันว่าเป็นกรน */
+  const end = (b) => {
+    const prev = d.lastB, like = snoreLike(b), out = [];
+    d.lastB = b;
+    if (d.pend && b.t - d.pend.end > C.RESUME_S) d.pend = null;
+    const quiet = prev ? b.t - prev.end : 0;
+    if (prev && prev.sn && quiet >= C.PAUSE_S && quiet <= C.PAUSE_MAX_S && d.snLvl && b.pk >= d.snLvl + C.GASP_DB &&
+      b.dur >= C.GASP_MIN_S && b.dur <= C.GASP_MAX_S) { d.pend = b; d.run = 0; d.rb = []; return out; }
+    if (d.pend && like) { d.pauses++; d.pend = null; }
+    if (!like) { /* เสียงพูดหรือเสียงกระแทก/ไอ = คนตื่นหรือมีเสียงอื่น ตัดจังหวะ · เสียงเล็ก ๆ อื่น (สั้นมาก ซ่าแหลม) = ข้ามไป ไม่ตัดจังหวะ */
+      if (speechy(b) || (impulse(b) && b.dur >= C.MIN_S)) { d.run = 0; d.rb = []; }
+      return out;
+    }
+    const n = d.rb.length, last = d.rb[n - 1], gap = last ? b.t - last.t : 99, pg = n > 1 ? last.t - d.rb[n - 2].t : 0;
+    const ok = gap >= C.GAP_MIN && gap <= C.GAP_MAX && (!pg || (gap <= pg * C.GAP_JUMP && gap * C.GAP_JUMP >= pg));
+    d.run = ok ? d.run + 1 : 1;
     d.rb = (d.run === 1 ? [] : d.rb.slice(-2)).concat(b);
-    if (d.run < 3) return [];
-    const added = d.rb.filter((x) => !x.sn);
-    added.forEach((x) => { x.sn = 1; d.count++; if (x.t - d.lastSn > 60) d.eps++; d.lastSn = x.t; d.snMax = Math.max(d.snMax, x.pk); });
-    return added;
+    if (d.run < C.RUN_MIN) return out;
+    d.rb.filter((x) => !x.sn).forEach((x) => {
+      x.sn = 1; d.count++; out.push(x);
+      if (x.t - d.lastSn > C.EPISODE_GAP) d.eps++;
+      d.lastSn = x.t; d.snMax = Math.max(d.snMax, x.pk); if (x.pk >= C.LOUD_DB) d.loud++;
+      d.snLvl = d.snLvl ? d.snLvl + (x.pk > d.snLvl ? 0.5 : -0.5) : x.pk; /* ระดับกรนกลางของคืนนั้น (median แบบเดินทีละ 0.5 dB) */
+    });
+    return out;
+  };
+  /* t = วินาทีนับจากเริ่ม · db = ระดับเสียง · ratio = พลังงานความถี่ต่ำ ÷ ความถี่สูง (LOW_HZ ÷ HIGH_HZ) · เรียกราว 10 ครั้งต่อวินาที */
+  d.push = (t, db, ratio) => {
+    if (!d.floor) d.floor = db;
+    else { const s = d.burst && t - d.burst.t > C.MAX_S * 2 ? 0.5 : 0.1; d.floor += db > d.floor ? s * C.FLOOR_Q : -s * (1 - C.FLOOR_Q); }
+    const b = d.burst;
+    if (!b) { if (db > d.floor + C.START_DB) d.burst = { t, pk: db, tp: t, rs: ratio, n: 1, top: db, dip: 0, low: 0, dips: 0, q: 0 }; return []; }
+    if (db < d.floor + C.END_DB) { /* เบาลง: รอ MERGE_S ก่อนตัดสินว่าจบ ถ้าดังต่อในช่วงนี้ = เสียงเดียวกัน */
+      if (!b.q) b.q = t;
+      if (t - b.q >= C.MERGE_S) { d.burst = null; b.end = b.q; b.dur = b.q - b.t; return end(b); }
+    } else { b.q = 0; if (db > b.pk) { b.pk = db; b.tp = t; } b.rs += ratio; b.n++; }
+    b.top = Math.max(b.top, db);
+    if (!b.dip) { if (b.top - db >= C.DIP_DB) { b.dip = 1; b.low = db; } }
+    else { b.low = Math.min(b.low, db); if (db - b.low >= C.DIP_DB) { b.dips++; b.dip = 0; b.top = db; } }
+    return [];
   };
   return d;
 }
-/* สรุปทั้งคืนแบบย่อ (เก็บลงโปรไฟล์ได้ ราว 200 ไบต์) · mins[นาที] = [ดังสุด dB, ครั้งที่กรน] หรือว่าง = นาทีที่ไม่ได้ฟัง
-   tl = เส้นเวลา ≤ 48 ช่อง ช่องละ step นาที: "-" ไม่ได้ฟัง · 0–9 = สัดส่วนนาทีที่กรนในช่องนั้น */
+/* กรนดัง = ครั้งที่ดัง ≥ LOUD_DB อย่างน้อย 20 ครั้ง และเป็น ≥ 25% ของครั้งที่กรน (ไม่ใช้ค่าดังสุดครั้งเดียว ซึ่งแกว่งง่าย) */
+const snoreLoud = (s) => s.count >= 20 && (s.loud || 0) >= Math.max(20, s.count * 0.25);
+/* ระดับคำเตือน 1 ปกติ · 2 กรนดัง/บ่อย แนะนำปรึกษาแพทย์ · 3 เงียบแล้วเฮือกบ่อย ควรพบแพทย์เพื่อตรวจการนอน (ฟังสั้นห้ามระดับ 3) */
+function snoreAlert(s) {
+  const C = SNORE_CFG, m = s.minutes || 0, p = s.pauses || 0, pph = s.pph || 0;
+  if (m >= C.ALERT_MIN_LISTEN && p >= C.PAUSE_MIN_N && pph >= C.PAUSE_PER_H) return 3;
+  if (m >= C.MIN_LISTEN && s.count && (s.snoreMin / Math.max(1, m) >= C.OFTEN_FRAC || snoreLoud(s) || (p >= 3 && pph >= 2))) return 2;
+  return 1;
+}
+/* สรุปทั้งคืนแบบย่อ (เก็บลงโปรไฟล์ได้ ราว 230 ไบต์) · mins[นาที] = [ดังสุด dB, ครั้งที่กรน] หรือว่าง = นาทีที่ไม่ได้ฟัง
+   tl = เส้นเวลา ≤ 48 ช่อง ช่องละ step นาที: "-" ไม่ได้ฟัง · 0–9 = สัดส่วนนาทีที่กรนในช่องนั้น
+   loud = ครั้งที่กรนดัง · pauses = เงียบแล้วเฮือก (อาจหยุดหายใจ) · pph = ครั้งต่อชั่วโมงที่ฟัง · alert = ระดับคำเตือน 1–3 */
 function snoreSummary(real, t0, secs, mins, det) {
   const minutes = Math.round(secs / 60), n = mins.length, step = Math.max(1, Math.ceil(n / 48)), tl = [];
   let snoreMin = 0;
@@ -1378,20 +1456,26 @@ function snoreSummary(real, t0, secs, mins, det) {
     for (let j = i; j < Math.min(n, i + step); j++) if (mins[j]) { heard++; if (mins[j][1]) sn++; }
     tl.push(heard ? String(Math.ceil((sn / heard) * 9)) : "-");
   }
-  const d0 = new Date(t0), pad = (x) => String(x).padStart(2, "0");
-  return {
+  const d0 = new Date(t0), pad = (x) => String(x).padStart(2, "0"), pauses = det.pauses || 0;
+  const s = {
     real: !!real, start: `${pad(d0.getHours())}:${pad(d0.getMinutes())}`, minutes, count: det.count, episodes: det.eps, snoreMin,
-    maxDb: Math.round(det.snMax), floorDb: Math.round(det.floor), level: det.count === 0 ? "none" : snoreMin / Math.max(1, minutes) < 0.1 ? "mild" : "often",
-    tl: tl.join(""), step,
+    maxDb: Math.round(det.snMax), floorDb: Math.round(det.floor),
+    level: det.count === 0 ? "none" : snoreMin / Math.max(1, minutes) < SNORE_CFG.OFTEN_FRAC ? "mild" : "often",
+    tl: tl.join(""), step, loud: det.loud || 0, pauses, pph: minutes ? Math.round((pauses / minutes) * 600) / 10 : 0,
   };
+  s.alert = snoreAlert(s);
+  return s;
 }
 /* หักคะแนนการนอนตามสัดส่วนเวลาที่กรน: กรน 10% ของเวลาที่ฟัง = หัก 5 · สูงสุด 15 · ฟังไม่ถึง 30 นาที = ยังไม่หัก */
-const snorePenalty = (s) => (!s || !(s.minutes >= 30) ? 0 : Math.min(15, Math.round((s.snoreMin / s.minutes) * 50)));
+const snorePenalty = (s) => (!s || !(s.minutes >= SNORE_CFG.MIN_LISTEN) ? 0 : Math.min(15, Math.round((s.snoreMin / s.minutes) * 50)));
 /* SNORE-DET-END */
 function sampleNight() { /* ข้อมูลตัวอย่างทั้งคืน 23:00–07:00 ตรงกับหน้าผล (ใช้เมื่อไม่ได้วัดจากไมค์จริง) */
+  /* v8: ช่องเส้นเวลารวมได้ 38 นาทีพอดี (3+8+9+4+5+6+2+1) · กรนเบาเป็นช่วง ไม่ดังเกิน 60 dB ไม่มีเสียงเงียบแล้วเฮือก = คำเตือนระดับ 1 */
   const tl = Array(48).fill("0");
-  [[13, 4], [14, 9], [15, 9], [16, 5], [31, 6], [32, 9], [33, 3], [40, 2]].forEach(([i, v]) => (tl[i] = String(v)));
-  return { real: false, start: "23:00", minutes: 480, count: 412, episodes: 4, snoreMin: 38, maxDb: 58, floorDb: 33, level: "mild", tl: tl.join(""), step: 10 };
+  [[13, 3], [14, 8], [15, 9], [16, 4], [31, 5], [32, 6], [33, 2], [40, 1]].forEach(([i, v]) => (tl[i] = String(v)));
+  const s = { real: false, start: "23:00", minutes: 480, count: 412, episodes: 4, snoreMin: 38, maxDb: 58, floorDb: 33, level: "mild", tl: tl.join(""), step: 10, loud: 0, pauses: 0, pph: 0 };
+  s.alert = snoreAlert(s);
+  return s;
 }
 
 const MON = { on: false, paused: false, real: false, sum: null };
@@ -1455,14 +1539,14 @@ function monToggle() {
   if (!MON.paused) { monRelease(); MON.paused = true; monUI(); monLabel(MON.real ? "หยุดแล้ว ปิดไมค์แล้ว" : "ข้อมูลตัวอย่าง (เครื่องนี้เปิดไมค์ไม่ได้)", MON.real ? "" : "demo", MON.real ? MON_NOTE : SAMPLE_NOTE); return; }
   startMonitor(true);
 }
-function monLevel(t) { /* [dB โดยประมาณ, เสียงทุ้ม/เสียงแหลม] */
+function monLevel(t) { /* [dB โดยประมาณ, พลังงานความถี่ต่ำ ÷ สูง ตามช่วงใน SNORE_CFG] */
   if (MON.real) {
     MON.an.getFloatTimeDomainData(MON.td);
     let s = 0; for (let i = 0; i < MON.td.length; i++) s += MON.td[i] * MON.td[i];
     const db = 20 * Math.log10(Math.sqrt(s / MON.td.length) + 1e-9) + 94;
     MON.an.getFloatFrequencyData(MON.fd);
-    const hz = MON.ctx.sampleRate / MON.an.fftSize; let lo = 0, hi = 0;
-    for (let i = 1; i < MON.fd.length; i++) { const f = i * hz, p = Math.pow(10, MON.fd[i] / 10); if (f >= 60 && f < 500) lo += p; else if (f >= 500 && f < 4000) hi += p; }
+    const hz = MON.ctx.sampleRate / MON.an.fftSize, [l0, l1] = SNORE_CFG.LOW_HZ, [h0, h1] = SNORE_CFG.HIGH_HZ; let lo = 0, hi = 0;
+    for (let i = 1; i < MON.fd.length; i++) { const f = i * hz, p = Math.pow(10, MON.fd[i] / 10); if (f >= l0 && f < l1) lo += p; else if (f >= h0 && f < h1) hi += p; }
     return [clamp(db, 20, 100), lo / (hi + 1e-12)];
   }
   /* ข้อมูลตัวอย่าง วนทุก 90 วินาที: เงียบ → กรนเป็นจังหวะ 30 วินาที → รถผ่าน 1 ครั้ง (ไม่เป็นจังหวะ ไม่นับเป็นกรน) */
@@ -1496,6 +1580,7 @@ function monDraw() {
   $("#mon-bars").innerHTML = h;
   $("#mon-db").textContent = `${Math.round(MON.cur)} dB`;
   const d = MON.det;
+  /* ระหว่างหลับแสดงแค่จำนวนครั้ง ไม่แสดงคำเตือนหยุดหายใจและไม่ส่งเสียง/สั่น (ห้ามปลุก) คำเตือนอยู่ในหน้าผลเท่านั้น */
   $("#mon-sn").textContent = d.count ? `กรน ${d.count} ครั้ง · ดังสุด ${Math.round(d.snMax)} dB` : "ยังไม่พบเสียงกรน";
 }
 function stopMonitor() {
@@ -1554,7 +1639,7 @@ const LOG = [
   ["03:40", "เสียงรถข้างนอก 58 dB(A)", "เพิ่ม Brown noise เป็น 48 dB(A) 20 นาที · คุณตื่น 9 นาที", "alert"],
   ["06:30", "แสงอรุณเริ่ม", "0 → 250 lux · 2000 → 5000 K · แอร์ 26°C", "on"],
 ];
-const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)} ชม. ${m % 60} นาที` : `${m} นาที`);
+const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)} ชม.${m % 60 ? ` ${m % 60} นาที` : ""}` : `${m} นาที`);
 function renderLog() {
   $("#log").innerHTML = LOG.map(([t, h, s, c]) => `<li><time>${t}</time><span class="d ${c}"></span><p>${h}<small>${s}</small></p></li>`).join("");
 }
@@ -1601,7 +1686,7 @@ const durTH = (m) => (m < 1 ? "ไม่ถึง 1 นาที" : hm(m));
 const durShort = (m) => (m < 1 ? "<1 นาที" : m < 60 ? `${m} นาที` : `${Math.floor(m / 60)} ชม.${m % 60 ? ` ${m % 60} น.` : ""}`);
 function snoreText(s) {
   const tail = s.real ? "" : " (ตัวอย่าง)";
-  return s.count ? `${s.minutes < 30 ? "ฟังสั้น" : SN_LV[s.level]} · ${s.snoreMin || "<1"} นาทีจาก ${durTH(s.minutes)} · ${s.count} ครั้ง · ดังสุด ${s.maxDb} dB${tail}`
+  return s.count ? `${s.minutes < 30 ? "ฟังสั้น" : SN_LV[s.level]} · ${s.snoreMin || "<1"} นาทีจาก ${durTH(s.minutes)} · ${s.count} ครั้ง · ดังสุด ${s.maxDb} dB${s.pauses ? ` · เงียบแล้วเฮือก ${s.pauses} ครั้ง` : ""}${tail}`
     : `ไม่พบเสียงกรน · ฟัง ${durTH(s.minutes)} · พื้นห้อง ${s.floorDb} dB${tail}`;
 }
 function snoreLine(s) { /* เส้นเวลาทั้งคืน: ช่องละ step นาที · สูง = สัดส่วนนาทีที่กรน · เส้นประ = ช่วงที่ไม่ได้ฟัง */
@@ -1621,18 +1706,34 @@ function snoreLine(s) { /* เส้นเวลาทั้งคืน: ช่
   host.innerHTML = `<svg viewBox="0 0 ${w} ${H}" width="${w}" height="${H}" aria-hidden="true">${g}</svg>`;
   host.setAttribute("aria-label", `เส้นเวลาเสียงกรน ${hhmm(t0)} ถึง ${hhmm((t0 + span) % 1440)}: ${snoreText(s)}`);
 }
+/* กล่องคำเตือนในการ์ดเสียงกรน (เฉพาะคืนที่วัดจริง) · ระดับ 2 แนะนำปรึกษาแพทย์ · ระดับ 3 ควรพบแพทย์เพื่อตรวจการนอน
+   ใช้คำว่า แนะนำ/ควร ไม่วินิจฉัย และบอกเสมอว่าคัดกรองจากเสียงเท่านั้น · ระหว่างหลับไม่แสดง (ห้ามปลุก) */
+function snoreAlertBox(s) {
+  const C = SNORE_CFG, al = s.real ? s.alert || snoreAlert(s) : 1, p = s.pauses || 0, m = Math.max(1, s.minutes);
+  if (al === 3) return [3, "ควรพบแพทย์เพื่อตรวจการนอน (sleep\u00a0test)",
+    `พบช่วงที่เสียงกรนเงียบไป 10 วินาทีขึ้นไปแล้วตามด้วยเสียงหายใจเฮือก ${p} ครั้ง (ราว ${s.pph} ครั้งต่อชั่วโมง) ลักษณะนี้อาจเป็นสัญญาณของภาวะหยุดหายใจขณะหลับ ควรพบแพทย์ด้านการนอนหลับเพื่อตรวจการนอน โดยเฉพาะถ้าง่วงระหว่างวัน ตื่นมาปวดหัว หรือมีความดันโลหิตสูง`];
+  if (al !== 2) return null;
+  const why = [];
+  if (s.snoreMin / m >= C.OFTEN_FRAC) why.push(`กรนราว ${Math.round((100 * s.snoreMin) / m)}% ของเวลาที่ฟัง`);
+  if (snoreLoud(s)) why.push("เสียงกรนหลายครั้งดังกว่าเสียงพูดคุย");
+  if (p) why.push(`พบเสียงเงียบแล้วเฮือก ${p} ครั้ง${s.minutes < C.ALERT_MIN_LISTEN ? " แต่ฟังไม่ถึง 2 ชั่วโมง ยังประเมินเรื่องหยุดหายใจไม่ได้ ลองฟังทั้งคืนอีกครั้ง" : ""}`);
+  return [2, "แนะนำปรึกษาแพทย์", `${why.join(" · ")} ควรปรึกษาแพทย์เรื่องการหายใจขณะหลับ โดยเฉพาะถ้าง่วงระหว่างวัน มีคนเห็นว่าหยุดหายใจหรือสำลักตอนหลับ หรือมีความดันโลหิตสูง`];
+}
 function renderSnore() {
   SN.cur = MON.sum && MON.sum.real ? MON.sum : sampleNight();
-  const s = SN.cur, pen = snorePenalty(s), short = s.minutes < 30, loud = s.maxDb >= 60;
+  const s = SN.cur, pen = snorePenalty(s), short = s.minutes < SNORE_CFG.MIN_LISTEN, al = snoreAlertBox(s), box = $("#sn-alert");
+  box.hidden = !al; box.className = al ? `sn-alert lv${al[0]}` : "sn-alert";
+  box.innerHTML = al ? `<b>${esc(al[1])}</b><span>${esc(al[2])}</span><small>คัดกรองจากเสียงที่ไมค์มือถือได้ยินเท่านั้น ไม่ใช่การวินิจฉัย ผลจริงต้องตรวจการนอนกับแพทย์</small>` : "";
   const src = $("#sn-src"); src.textContent = s.real ? "วัดจากไมค์เครื่องนี้" : "ข้อมูลตัวอย่าง";
   $("#sn-stats").innerHTML = [[s.count, "ครั้ง", ["กรน", `${s.episodes} ช่วง`]], [s.snoreMin || (s.count ? "<1" : 0), "นาที", ["โดยประมาณ", `จาก ${durShort(s.minutes)}`]],
     [s.count ? s.maxDb : "–", "dB", ["ดังสุด", `เงียบสุด ${s.floorDb}`]]]
     .map(([v, u, sub]) => `<div><b>${esc(v)}</b><span>${u}</span>${sub.map((x) => `<small>${esc(x)}</small>`).join("")}</div>`).join("");
   snoreLine(s);
   const tip = s.level === "none" ? "ไม่พบเสียงกรนที่ดังเป็นจังหวะตลอดช่วงที่ฟัง"
-    : s.level === "often" || loud ? "กรนบ่อยหรือดัง แนะนำให้ลองนอนตะแคงและยกหัวเตียงเล็กน้อย และปรึกษาแพทย์เรื่องการหายใจขณะหลับ โดยเฉพาะถ้าตื่นมายังง่วง หรือมีคนเห็นว่าหยุดหายใจเป็นช่วง ๆ"
+    : al ? "ระหว่างนี้ลองนอนตะแคง ยกหัวเตียงเล็กน้อย และงดแอลกอฮอล์ก่อนนอน"
+    : s.level === "often" ? "กรนเป็นช่วงยาว ลองนอนตะแคงและยกหัวเตียงเล็กน้อย ถ้าตื่นมายังง่วง หรือมีคนเห็นว่าหยุดหายใจเป็นช่วง ๆ ควรปรึกษาแพทย์"
     : "กรนเบา ๆ เป็นช่วงสั้น พบได้ทั่วไป ลองนอนตะแคงและงดแอลกอฮอล์ก่อนนอน";
-  $("#sn-tip").innerHTML = (short && s.real ? `<span class="sn-short">ฟังไปเพียง ${durTH(s.minutes)} ผลยังไม่พอสรุป ลองฟังทั้งคืนเพื่อดูผลจริง</span><br>` : esc(tip) + " · ") + (s.real ? "ค่าประมาณจากระดับเสียงที่ไมค์มือถือได้ยิน ไม่ใช่การวินิจฉัย" : "ข้อมูลตัวอย่าง ไม่ได้วัดจริง เปิดแอปจากเว็บของทีมบนมือถือเพื่อวัดจากไมค์");
+  $("#sn-tip").innerHTML = (short && s.real ? `<span class="sn-short">ฟังไปเพียง ${durTH(s.minutes)} ผลยังไม่พอสรุป${s.pauses ? " รวมถึงเรื่องการหยุดหายใจ" : ""} ลองฟังทั้งคืนเพื่อดูผลจริง</span><br>` : esc(tip) + (al ? "" : " · ")) + (al ? "" : s.real ? "ค่าประมาณจากระดับเสียงที่ไมค์มือถือได้ยิน ไม่ใช่การวินิจฉัย" : "ข้อมูลตัวอย่าง ไม่ได้วัดจริง เปิดแอปจากเว็บของทีมบนมือถือเพื่อวัดจากไมค์");
   const sc = scoreNow();
   $("#grade").textContent = sc >= 85 ? "ดีมาก" : sc >= 70 ? "ดี" : "พอใช้";
   $("#score-adj").innerHTML = (pen ? `<b>หัก ${pen} คะแนนจากเสียงกรน</b> (กรน ${s.snoreMin} จาก ${s.minutes} นาที${s.real ? "" : " ตัวอย่าง"})`
@@ -1790,7 +1891,11 @@ const allRecs = () => [...REC.items.map((r) => ({ ...r, _local: false })), ...RE
 function cleanSn(x) { /* ข้อมูลจากฐานข้อมูล (คนอื่นเขียนได้) → ตัวเลขที่ปลอดภัย · รายการเก่าไม่มี snore = null */
   if (!x || typeof x !== "object") return null;
   const n = (v) => (Number.isFinite(+v) ? Math.max(0, Math.round(+v)) : 0);
-  return { real: x.real === true, minutes: n(x.minutes), count: n(x.count), episodes: n(x.episodes), snoreMin: n(x.snoreMin), maxDb: n(x.maxDb), floorDb: n(x.floorDb), level: SN_LV[x.level] ? x.level : "none" };
+  const y = { real: x.real === true, minutes: n(x.minutes), count: n(x.count), episodes: n(x.episodes), snoreMin: n(x.snoreMin), maxDb: n(x.maxDb), floorDb: n(x.floorDb), level: SN_LV[x.level] ? x.level : "none",
+    loud: n(x.loud), pauses: n(x.pauses) };
+  y.pph = y.minutes ? Math.round((y.pauses / y.minutes) * 600) / 10 : 0; /* คำนวณใหม่จากจำนวนครั้ง ไม่เชื่อ pph ที่เขียนมา */
+  y.alert = "alert" in x ? snoreAlert(y) : 0; /* v8 ขึ้นไป: ระดับเตือนคำนวณใหม่จากตัวเลข · รายการเก่าไม่มี alert = 0 ไม่ขึ้นป้าย */
+  return y;
 }
 function snoreTrends(all) { /* คนเดียวกัน (ชื่อเดียวกัน) มีผลกรน 2 คืนขึ้นไป → สรุป 3 คืนล่าสุด ติดไว้ที่การ์ดล่าสุดของคนนั้น */
   const by = {}, out = {};
@@ -1817,6 +1922,7 @@ function recCard(r, trend) {
     <div class="rec-h"><div class="rec-who"><b class="rec-n">${esc(r.name || "ไม่ระบุชื่อ")}</b><small>${esc(meta)}</small><small class="num">${esc(r.preset || "")}</small></div>${sc}</div>
     ${sumHTML(rows)}
     ${sn ? `<p class="rec-sn"><b>เสียงกรน</b><span>${esc(snoreText(sn))}</span></p>` : ""}
+    ${sn && sn.alert >= 2 ? `<p class="rec-alert lv${sn.alert}">${sn.alert === 3 ? "ควรพบแพทย์เพื่อตรวจการนอน" : "แนะนำปรึกษาแพทย์"}${sn.pauses ? ` · เงียบแล้วเฮือก ${sn.pauses} ครั้ง (${sn.pph}/ชม.)` : ""} · คัดกรองจากเสียง</p>` : ""}
     ${trend ? `<p class="rec-trend">${esc(trend)}</p>` : ""}
     ${r.note ? `<p class="rec-note">${esc(r.note)}</p>` : ""}
     <div class="rec-acts"><button class="btn sm" type="button" data-use="${esc(r.id)}">ใช้ค่านี้ตั้งห้อง</button><button class="btn ghost sm" type="button" data-del="${esc(r.id)}">ลบ</button></div>
@@ -1971,5 +2077,5 @@ initDb();
 })();
 
 </script>
-
-</body></html>
+</body>
+</html>
