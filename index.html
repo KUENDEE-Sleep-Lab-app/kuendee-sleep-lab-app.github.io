@@ -1,0 +1,1975 @@
+<!doctype html><html lang="th"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="icon" href="icon.svg" type="image/svg+xml"></head><body>
+<title>KUENDEE Sleep Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#101d38">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&family=Prompt:wght@300;400;500&family=Sriracha&display=swap" rel="stylesheet">
+
+<style>
+/* Layout: มือถือ = คอลัมน์เดียว + แถบแท็บล่าง · จอกว้าง ≥ 860px = แถบเมนูซ้าย + 2 คอลัมน์ (แท็บเล็ตข้างเตียง)
+   ธีม: กลางคืน (กรมท่า) สำหรับห้อง/โหมดหลับ · กลางวัน (เบจ) สำหรับผลการนอนและแผนกลับบ้าน — สลับด้วย body.day
+   CI KUENDEE (PDF หน้า 27–37): Navy #101d38 · Warm Beige #f4eae0 · Sage #6d8d6e · Earth #9c5330 · ฟ้าเทารอง #8eaccb #9eb0c1 #b6c4d1 #d2d9e1
+   ฟอนต์ Poppins + Prompt · Sub font Charcoal (ใช้ Sriracha แทน) · โลโก้สีเดียว ไม่มีแสงเรือง */
+:root{
+  --navy-950:#0b1529; --navy-900:#101d38; --navy-800:#16264a; --navy-700:#1f3157;
+  --beige:#f4eae0; --sand:#d9c6ad; --sage:#6d8d6e; --sage-hi:#8fae90; --earth:#9c5330; --earth-hi:#c27a4e;
+  --blue-1:#8eaccb; --blue-2:#9eb0c1; --blue-3:#b6c4d1; --blue-4:#d2d9e1;
+
+  /* โทเคนตามธีม (ค่าตั้งต้น = กลางคืน) */
+  --bg:#101d38; --bg-2:#16264a; --fg:#f4eae0;
+  --fg-2:rgba(244,234,224,.8); --fg-3:rgba(244,234,224,.6); --fg-4:rgba(244,234,224,.42);
+  --card:#162443; --card-2:rgba(244,234,224,.085);
+  --line:rgba(244,234,224,.11); --line-2:rgba(244,234,224,.22); --track:rgba(244,234,224,.15);
+  --accent:#d9c6ad; --ok:#8fae90; --ok-bg:rgba(143,174,144,.16);
+  --btn-bg:#f4eae0; --btn-fg:#101d38; --bar:rgba(11,21,41,.88); --sheet:#16264a; --scrim:rgba(5,10,22,.62);
+  --st-wake:#c27a4e; --st-rem:#d9c6ad; --st-light:#b6c4d1; --st-deep:#8fae90;
+  --sky-a:#0b1529; --sky-b:#16264a; --wave:#f8e3bf; --stars:.22;
+
+  --th:"Prompt","Poppins",system-ui,sans-serif;
+  --num:"Poppins","Prompt",system-ui,sans-serif;
+  --hand:"Sriracha","Prompt",cursive;
+  --r-lg:24px; --r-md:18px; --r-sm:12px;
+  --ease:cubic-bezier(.22,.8,.24,1);
+  --bar-h:66px;
+  color-scheme:dark;
+}
+body.day{
+  --bg:#f4eae0; --bg-2:#fbf7f1; --fg:#101d38;
+  --fg-2:rgba(16,29,56,.8); --fg-3:rgba(16,29,56,.6); --fg-4:rgba(16,29,56,.4);
+  --card:#fbf7f1; --card-2:rgba(16,29,56,.05);
+  --line:rgba(16,29,56,.1); --line-2:rgba(16,29,56,.2); --track:rgba(16,29,56,.13);
+  --accent:#9c5330; --ok:#5b7a5c; --ok-bg:rgba(109,141,110,.15);
+  --btn-bg:#101d38; --btn-fg:#f4eae0; --bar:rgba(244,234,224,.92); --sheet:#fbf7f1; --scrim:rgba(16,29,56,.38);
+  --st-wake:#9c5330; --st-rem:#c9a37a; --st-light:#8eaccb; --st-deep:#6d8d6e;
+  --sky-a:#f4eae0; --sky-b:#efe2d3; --wave:#9c5330; --stars:0;
+  color-scheme:light;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--th);font-weight:300;font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background-color .7s var(--ease),color .7s var(--ease)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+
+/* ฉากหลัง: ค่ำคืนกรมท่า + เส้นโค้ง Fluid Rhythm (กลางวันเป็นเบจอุ่น) */
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,var(--sky-a),var(--sky-b));transition:background .7s}
+.sky::before{content:"";position:absolute;inset:0;opacity:var(--stars);transition:opacity .7s;
+  background-image:radial-gradient(1px 1px at 12% 14%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 31% 7%,#fff 50%,transparent 51%),
+  radial-gradient(1.2px 1.2px at 66% 12%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 84% 22%,#fff 50%,transparent 51%),
+  radial-gradient(1px 1px at 47% 28%,#fff 50%,transparent 51%),radial-gradient(1.4px 1.4px at 93% 5%,#fff 50%,transparent 51%)}
+.sky svg{position:absolute;left:-10%;width:120%;bottom:-4%;height:40%}
+.sky path{fill:none;stroke:var(--wave);stroke-opacity:.16;transition:stroke .7s}
+.sky path+path{stroke-opacity:.1}
+
+/* โครง */
+.shell{position:relative;z-index:1;min-height:100%}
+.rail{display:none}
+.main{max-width:560px;margin:0 auto;padding-block:14px calc(var(--bar-h) + 34px + env(safe-area-inset-bottom,0px));
+  padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+
+/* โลโก้: พระจันทร์เสี้ยว + เส้นโค้ง (สีขาวบนกรมท่า / กรมท่าบนเบจ ไม่มีแสงเรือง) */
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg)}
+.brand svg{width:44px;height:24px;flex:none}
+.brand b{display:block;font-family:var(--num);font-weight:300;font-size:14px;letter-spacing:.38em;line-height:1.2}
+.brand small{display:block;font-family:var(--num);font-weight:400;font-size:8.5px;letter-spacing:.3em;color:var(--fg-3);text-transform:uppercase}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);
+  font-size:12.5px;color:var(--fg-2);background:var(--card);white-space:nowrap}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+
+/* ตัวอักษร */
+.eyebrow{font-family:var(--num);font-weight:400;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{margin:0;font-weight:300;text-wrap:balance}
+h1{font-size:clamp(24px,6.6vw,36px);line-height:1.24;margin-top:6px}
+h2{font-size:clamp(25px,6.6vw,32px);line-height:1.26;margin-top:8px}
+h3{font-size:16.5px;font-weight:400;line-height:1.35}
+.sec-h{margin-top:26px;margin-bottom:6px}
+.sec-h h3{margin-top:4px}
+p{margin:0}
+.lead{color:var(--fg-2);margin-top:10px;max-width:36em}
+.muted{color:var(--fg-3)}
+.hand{font-family:var(--hand);font-weight:400}
+
+/* ปุ่ม */
+.btn{appearance:none;border:0;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:0 22px;
+  border-radius:999px;background:var(--btn-bg);color:var(--btn-fg);font-size:16px;font-weight:500;transition:transform .2s var(--ease),background .7s,color .7s}
+.btn:active{transform:scale(.98)}
+.btn small{font-weight:400;font-size:13px;opacity:.68}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line-2);font-weight:400}
+.btn svg.i{width:18px;height:18px}
+
+/* แถบแท็บล่าง (มือถือ) */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;
+  padding:7px max(10px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));
+  background:var(--bar);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-top:1px solid var(--line);transition:background .7s}
+.tab{appearance:none;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:72px;padding:6px 8px;
+  border-radius:14px;color:var(--fg-4);font-size:11.5px;font-weight:400;transition:color .25s,background .25s}
+.tab svg.i{width:23px;height:23px}
+.tab[aria-selected="true"]{color:var(--fg)}
+
+/* จอกว้าง: แถบเมนูซ้าย */
+@media (min-width:860px){
+  .shell{display:grid;grid-template-columns:236px minmax(0,1fr)}
+  .rail{display:flex;flex-direction:column;gap:30px;position:sticky;top:0;height:100vh;height:100dvh;
+    padding:30px 18px max(26px,env(safe-area-inset-bottom,0px)) max(22px,env(safe-area-inset-left,0px));border-right:1px solid var(--line)}
+  .rail .brand{flex-direction:column;align-items:flex-start;gap:12px}
+  .rail .brand svg{width:64px;height:35px}
+  .rail .brand b{font-size:17px}
+  .rail nav{display:flex;flex-direction:column;gap:4px}
+  .rail .tab{flex-direction:row;justify-content:flex-start;gap:12px;width:100%;min-width:0;padding:12px 14px;font-size:15px;color:var(--fg-3)}
+  .rail .tab[aria-selected="true"]{background:var(--card-2);color:var(--fg)}
+  .rail .room{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:var(--r-md);border:1px solid var(--line);font-size:13px;color:var(--fg-3)}
+  .rail .room b{font-weight:400;color:var(--fg);font-size:14px}
+  .tabbar,.top{display:none}
+  .main{max-width:1180px;width:100%;margin:0;padding:34px max(36px,env(safe-area-inset-right,0px)) 48px 36px}
+}
+
+/* ---------- หน้า (view) ---------- */
+.view{display:none}
+.view.on{display:block;animation:enter .55s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.grid{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.greet-row{display:flex;flex-direction:column;align-items:flex-start}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{appearance:none;display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--card);font-size:12.5px;color:var(--fg-2);text-align:left}
+.tag b{font-family:var(--num);font-weight:400;letter-spacing:.05em;color:var(--fg)}
+.tag svg.i{width:15px;height:15px}
+button.tag:hover{border-color:var(--accent)}
+
+/* ---------- ภาพห้อง: รูป Sleep Lab Room ของทีม (PDF หน้า 35) + ชั้นแสงโปร่งใสซ้อน ไม่แก้ไฟล์รูป ----------
+   ตัวแปรตั้งจาก drawScene() · ตำแหน่งทุกชั้นเป็น % ของรูปเต็ม (.cv มีสัดส่วนเท่ารูป แล้วเลื่อนขึ้นให้เห็นโลโก้ เตียง และพรม) */
+@property --kc{syntax:"<color>";inherits:true;initial-value:#ffb46b}
+@property --wb{syntax:"<color>";inherits:true;initial-value:#808080}
+@property --wm{syntax:"<color>";inherits:true;initial-value:#ffffff}
+@property --sk1{syntax:"<color>";inherits:true;initial-value:#53638e}
+@property --sk2{syntax:"<color>";inherits:true;initial-value:#e9b68b}
+.scene{position:relative;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:#0b1529}
+.scene .photo{position:relative;aspect-ratio:360/200;overflow:hidden;isolation:isolate;transition:--kc .7s,--wb .7s,--wm .7s,--sk1 .9s,--sk2 .9s}
+.scene .cv{position:absolute;left:0;top:0;width:100%;aspect-ratio:1140/912;transform:translateY(-17.5%)}
+.scene .cv>*{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.scene .cv img{display:block;object-fit:cover}
+.cv>i{opacity:0;transition:opacity .7s var(--ease)} /* ค่าความเข้มของแต่ละชั้นอยู่ในกฎ .scene .l-* ด้านล่าง (specificity สูงกว่า) */
+/* ห้อง = ทั้งภาพ ยกเว้นกระจกส่วนบน (เหนือราวระเบียง) · ท้องฟ้า/ภูเขาแบ่งตามสันเขาที่วัดจากพิกเซลของรูป */
+.scene .l-warm,.scene .l-tint,.scene .l-lift{clip-path:polygon(0 0,100% 0,100% 14.9%,63% 22%,63% 48.6%,100% 48.6%,100% 100%,0 100%)}
+.scene .l-sky{clip-path:polygon(63% 22%,100% 14.9%,100% 32.8%,99.5% 33.1%,98.5% 33.8%,97.5% 34.6%,96.5% 35.2%,95.5% 35.6%,94.5% 35.4%,93.5% 35.4%,92.5% 35.7%,91.5% 36.1%,90.5% 35.6%,89.5% 35.3%,88.5% 35.1%,87.5% 35%,86.5% 35.1%,85.5% 35.2%,84.5% 35%,83.5% 35.4%,82.5% 36%,81.5% 36.6%,80.5% 37.2%,79.5% 38%,78.5% 37.9%,77.5% 38.3%,76.5% 38.7%,75.5% 39.3%,74.5% 39.5%,73.5% 39.5%,72.5% 39.8%,71.5% 40.2%,70.5% 39.8%,69.5% 39.6%,68.5% 39.4%,67.5% 39.4%,66.5% 39.3%,65.5% 38.9%,64.5% 38.6%,63.5% 38.9%,63% 39%)}
+.scene .l-land{clip-path:polygon(63% 39%,63.5% 38.9%,64.5% 38.6%,65.5% 38.9%,66.5% 39.3%,67.5% 39.4%,68.5% 39.4%,69.5% 39.6%,70.5% 39.8%,71.5% 40.2%,72.5% 39.8%,73.5% 39.5%,74.5% 39.5%,75.5% 39.3%,76.5% 38.7%,77.5% 38.3%,78.5% 37.9%,79.5% 38%,80.5% 37.2%,81.5% 36.6%,82.5% 36%,83.5% 35.4%,84.5% 35%,85.5% 35.2%,86.5% 35.1%,87.5% 35%,88.5% 35.1%,89.5% 35.3%,90.5% 35.6%,91.5% 36.1%,92.5% 35.7%,93.5% 35.4%,94.5% 35.4%,95.5% 35.6%,96.5% 35.2%,97.5% 34.6%,98.5% 33.8%,99.5% 33.1%,100% 32.8%,100% 48.6%,63% 48.6%)}
+/* สีแสง K เทียบกับแสงในรูป (~2700K): อุ่นกว่า = คูณสี (ส้มแบบแสงเทียน พรมยังกรมท่า) · เย็นกว่า = soft-light เบาๆ (ขาวขึ้น ไม้ไม่ม่วง) */
+.scene .l-warm{background:var(--wm);mix-blend-mode:multiply;opacity:var(--warm)}
+.scene .l-tint{background:var(--wb);mix-blend-mode:soft-light;opacity:var(--tint)}
+/* สว่างกว่าในรูป (เกิน 150 lux) · soft-light ให้สว่างขึ้นโดยไม่ขุ่น */
+.scene .l-lift{background:radial-gradient(95% 85% at 38% 50%,var(--kc),rgba(255,255,255,.35));mix-blend-mode:soft-light;opacity:var(--lift)}
+/* หรี่ไฟ: ห้องมืดลงเป็นโทนกรมท่า ใกล้หน้าต่างสว่างกว่านิดหน่อยเพราะแสงจันทร์
+   mask: กระจกมืดลงแค่ 45% ของห้อง (วิวกลางคืนยังเห็น) แล้วค่อยๆ มืดเท่าห้องลงไปถึงพื้น ไม่มีรอยต่อ
+   ส่วนเงาสะท้อนโคมและไฟซ่อนบนกระจกมืดเท่าห้อง ปิดไฟแล้วเงาสะท้อนหายไปด้วย */
+.scene .l-dark{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3ClinearGradient id='g' gradientUnits='userSpaceOnUse' x1='0' y1='44' x2='0' y2='62'%3E%3Cstop offset='0' stop-opacity='.45'/%3E%3Cstop offset='1'/%3E%3C/linearGradient%3E%3Cfilter id='b' x='-1' y='-1' width='3' height='3'%3E%3CfeGaussianBlur stdDeviation='.4'/%3E%3C/filter%3E%3Cpath fill-rule='evenodd' d='M0 0H100V100H0ZM63 22L100 14.9L100 67L63 61Z'/%3E%3Cpath fill='url(%23g)' d='M63 22L100 14.9L100 67L63 61Z'/%3E%3Cg filter='url(%23b)' fill-opacity='.85'%3E%3Cpath d='M69.6 22.5L81.4 26.9L69.6 24.4Z'/%3E%3Cellipse cx='72.8' cy='46.9' rx='3.4' ry='.8'/%3E%3Cellipse cx='73.9' cy='52' rx='2' ry='3.3'/%3E%3C/g%3E%3C/svg%3E");background:radial-gradient(70% 60% at 82% 45%,#2b3d63,#0d1730 62%,#080f22);mix-blend-mode:multiply;opacity:var(--dark);-webkit-mask:var(--m) 0 0/100% 100% no-repeat;mask:var(--m) 0 0/100% 100% no-repeat}
+/* ท้องฟ้าและภูเขาตอนเช้า */
+.scene .l-sky{background:linear-gradient(180deg,var(--sk1) 17%,var(--sk2) 37%);mix-blend-mode:screen;opacity:var(--sky)}
+.scene .l-land{background:linear-gradient(180deg,#7d8ca6 35%,#46546b 48%);mix-blend-mode:screen;opacity:var(--land)}
+/* แดดเช้าส่องจากหน้าต่างเข้าห้อง · soft-light อุ่นและสว่างขึ้นแต่ยังคมชัด */
+.scene .l-sun{background:radial-gradient(60% 55% at 74% 50%,#ffd9a8,rgba(255,217,168,.45) 55%,rgba(255,217,168,0) 85%);mix-blend-mode:soft-light;opacity:var(--sun)}
+/* แสงจันทร์ตกบนพื้นหน้าหน้าต่าง */
+.scene .l-moon{background:radial-gradient(15% 4.5% at 70% 65.5%,rgba(182,196,209,.42),transparent),radial-gradient(9% 20% at 65% 44%,rgba(182,196,209,.14),transparent);mix-blend-mode:screen;opacity:var(--moon)}
+/* ผ้าม่านปิด: ห้องฝั่งหน้าต่างไม่มีแสงจันทร์ ทำให้มืดเท่าห้อง (หักสีอ่อนตรงกลางของ .l-dark) */
+.scene .l-shut{background:radial-gradient(70% 60% at 82% 45%,#4d607c,#fff 62%);mix-blend-mode:multiply;opacity:var(--shut)}
+/* ผ้าม่านทึบแสง (ปิดเมื่อ .photo.shut)
+   - ผืนผ้าอยู่ในระนาบผนังหน้าต่าง: .dr map ด้วย matrix3d จาก drapeFit() · รางม่าน = ขอบบนแถบไฟซ่อน · ชายม่าน = แนวพื้น · เริ่มที่กองม่านเดิม (x 56–63%)
+   - ของที่อยู่หน้าม่าน (เตียง เก้าอี้ ที่พ่นกลิ่น) ตัดด้วยหน้ากากจากพิกเซลรูป (drape_mask.py → build.py ฝังเป็น data URI)
+   - จีบ 18 ลอนต่อผนังที่เห็น สีจากม่านเดิมในรูป ด้านซ้ายของลอนรับแสงโคม · ไฟซ่อนส่องหัวม่าน · เลื่อนปิดจากซ้าย = scaleX จากกองม่าน
+   - แสงในห้อง (มืด/อุ่น/เย็น/สว่าง) ใช้ตัวแปรชุดเดียวกับชั้นอื่น ซ้อนในผืนผ้าเอง */
+.scene .l-drape{--dm:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABHQAAAOQCAQAAADyd+4nAAAU40lEQVR42u3dC3Hj2BZAUUEIBEMwBEMIBEMIhDBoCIYQCIYgCIZgCDNSHMffOIqs3zlad9Wb6u5605V20uOde66kovgPACApLwEAIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOACB0AACEDgCA0AEAEDoAAEIHAEDoAABCBwBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AQOgAAAgdAAChAwAgdAAAhA4AgNABAIQOAIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMACB0AAKEDACB0AACEDgCA0AEAEDoAgNABABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwAQOgAAQgcAQOgAAAgdAAChAwAgdAAAoQMAIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOACB0AACEDgCA0AEAEDoAAEIHAEDoAABCBwBA6AAACB0AAKEDACB0AACEDgAgdLwEAIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMACB0AAKEDACB0AACEDgCA0AEAEDoAAEIHABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwAQOgAAQgcAQOgAAAgdAAChAwAgdAAAhA4AIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOACB0AACEDgCA0AEAEDoAAEIHAEDoAABCBwBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AQOgAAAgdAAChAwAgdAAAhA4AgNABAIQOAIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMACB0AAKEDACB0AACEDgCA0AEAEDoAgNABABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwAQOgAAQgcAQOgAAAgdAAChAwAgdAAAoQMAIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOACB0AACEDgCA0AEAEDoAAEIHAEDoAABCBwBA6AAACB0AAKEDACB0AACEDgCAlwAAEDoAAEIHAEDoAAAIHQAAoQMAIHQAAKEDACB0AACEDgCA0AEAEDoAAEIHABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwBA6AAAQgcAQOgAAAgdAAChAwAgdAAAhA4AIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOAIDQAQCEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AQOgAAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMAIHQAAKEDACB0AACEDgCA0AEAEDoAAEIHABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwAQOl4CAEDoAAAIHQAAoQMAIHQAAIQOAIDQAQCEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AAKEDAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgAAQgcAEDoAAEIHAEDoAAAIHQAAoQMAIHQAAKEDACB0AACEDgCA0AEAEDoAAEIHABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwBA6AAAQgcAQOgAAAgdAAChAwAgdAAAhA4AIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOAIDQAQCEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AQOgAAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQDy2xdlsf1WVj8XOgBAksz5KNbF6tu62KQJHp9eAJh95rwWL8VpvRTLs+CJnTs+wQAgc4p76xA8sfd3fIoBQOY8WLH3d3ySAUDmNFh97e/UB6H7yyefZgCQOY3X5f7OdfI0iZbTFV71//NwEPr0u116PoB8ogFA5vx5HYNndREpm89o+bjJk32x+/q18yu86n9z8/lRnH63S/d+L6EDAPyirCKifebcT55V9aM6Wl5v9mc2xfvXr23O8qr+N5cPP4r693oudXyqAWCG+zmbKjH6Wrf7M8ti8fVryz/m1UsVZKXQAQCGGlsNu1bFVugAAMOPrYQOADCjsZXQAQCMrZzRAQDmnTlFsSw2rroCAJqIdTrn+cGV0AGAGdlW4VAIHQBA6MQ/oSN0AGA2ol1v9fwJHaEDALPJnGgHkZ8fXAkdAJA5QgcAiCze9VZdnNAROgAwC/Gut+rihI7QAYBZDK6iHUPuZnAldAAgeeLsKhHP5wgdAOCXzPko3isRM6eLEzpCBwASq48gLyrxMqebEzpCBwAS7+dEPJnT5eBK6ABA4rHVa8i9HKEDADQYW8XNnG5O6AgdADC2SntCR+gAgLFV2sGV0AEAmSN0AIAoYp/O6fKEjtABgHT7ObFP53R5QkfoAICxVdrBldABAJkjdACA6Yt/OkfoAAA/7OfEP50jdACAxGMroQMAJM4coQMApM2c7u6iI3QAQOakvYuO0AGA8LJca9X94EroAIDQEToAwFTtivdiIXSEDgDY0RE6AEAYeW4TKHQAgKvMyXXFldABABJnjtABYGJvtmX1xrSt/rn3asgcoQNALmXxVr01rap/ll4NmSN0AMhlW70xdf32xHwzR+gAMKk33OM1P/FDJ84QLnPmdPmkK6EDwJNZsPl+w+3yCUVj/VnWn0O4dfWj7aSTJ9udc/p60pXQAaB1GByyYPn9hvtSJc8m4JHk2z/LS/Wj1YSTJ9+dc/oaXAkdAFoOTtZniXMaOiyrX/8IlTo//VmKySZP5rGV0AFg4udD6n2dOKnTPBouk2e82MmeOUIHgImnQbeHSad31uWwbzXO/k7+zBE6AEw+DaIcS25/1uV2pDVM8GQ+hCx0AAiSBlHGV11kwzF5hgie3IeQhQ4AYdIgxvjqeKvDbu7+suz5BM8cxlZCB4AgaTD92wf2sz/S1wmeuWRO14nsLy0AvaTB9EOnv/Mu1yd4ns+duWRO9+e7/LUFoJc0mH7odDm4epw8zXPn+BCKa5uZZE73Xzf+2gLQSxoInSa5cx02x4dQXFvOJHOEDkDLnYjt08qwz3GyozN26Nzmzk9hM5+gEToAHXq7+13y31y+Qc0zfnKd0Rk6dK7P7wgboQPQkVXnb1BzjZ+mcRDh8vJxQsca9uvGf/4AoSN+ehheRbg3stDJf82V0AGEzijxEzd8ml3mPL/bBVrTHFwJHUDojBI/Yz0ScphzOlEeACF0hA6A0BnkhnKxkufx+CpK5ggdoQMgdCTPr+Or292qjyDJJnTyH0UWOoDQkTxPja/q/Zuo54+ETv6jyEIHEDqS56lIiHB1ldCZ7+BK6ABCJ1jyTCV4jpEw/dsCCh2hAyB0wiTPVIJH6FgRTugIHUDohA6e8XInQ+j85cldVswTOkIHEDqhg2e8/Z0MofOXJ3dZMQdXQgcQOgZaQsdKO7gSOoDQETwzDZ1mD7OwYg+uhA4gdBIHT5+5Ez90dsV7sdAXyQdXQgcQOomDp8/9HTs6VoTBldABhI79nRmf0ZE62QdXQgcQOjPb3+kqdzKEjuPI+QdXQgcQOnJnxqHjpoHZB1dCBxA6ckfoWGkHV0IHEDozz522sWN0ZUUYXAkdQOjMPHfWxUer1MkROrviX/UncBzZjg6A0EkbO6+tUifLjk5ZvcW68mrstSjeq+gUOgBCZzKpk+WMjvFV3NgWOgBCp7drXvKEjgPJmQdXQgcQOlart5pMoVNWoWd4FSmzhQ6A0On5zSZT6Bhe5d3PETqA0LFaBUum0DG8yrufI3QAoWO1+r5a6FhTP4YsdAChY7X+zjpX6Dilk3NsJXQAoWO1HF7lCh3PMc85thI6gNCxWn53nSt0pE7OsZXQAYSO1fL762yhI3Uyjq2EDiB0rJbDq3yhI3Xyja2EDiB0rJbfY2cMHamTbz9H6ABCx2r1XXbO0JE62fZzhA4gdKxWw6usoSN1cu3nCB1A6FhC507qrKs3Y7ETfz9H6ABCxxI6d1KnLDb2dXrKnGEuKxc6gNCxnhgp5A4d+zpZMkfoAELHajVUyB869nWin84ROoDQsVoPr+YQOo4mxz6dI3QAoWMJHamTej9H6ABCxxI6v6bOpnqLtoY87C50AITOqN9zCx3rr2OrZfE2+OBK6ABCx2p1imJOoVNWr8lLgM/cYsIfZX211aZ6JfdCB0DoRBgvzOmMToT9nDok3id7lmj4i8qFDiB0LKHTIHKiXGC+qDJnW/1v4RCy0AGEjiV0miTOtnp7vrxl4HTHQ9Pd0RnrbI7QAYSO9cR339lDp6zenFdXkbOssmfK46HFJDNnrLM5QgcQOtYTx5GzP+vq+lzO8Q179/lgiNUZD4mY5tkcoQPMytvFWxOPNRk0lF+v6ZhDiT73c66vszrtcx2GWiebq/CRPlPKHKEDzMTlWxOPNRk0HN/uy9HfyPqwvdoDfLTLtb/56pI+08kcoQMAvw6u/nbVUJP0yR9BY15pJXQAoPHg6vlHUe4f7Ck+iqC4OTTG4zuFDgA0Cp3LM13rXkcw+0aD1VjjsKmMrYQOAPyaHlM4h3RvHDbdGxlOZWwldAAgbI79/GiK+p4/Y+74CB0A4EnbH+4Pdbjnz/mwa+joMboCAHoJnWNknA+7Lk/4DJE95x/FuKM/XygAkCh07o2NLk/4DLPXUz9mdFf5V7yNurvjCwUAQrq9f3Ozh3L8vNfT5UXtx9B5r36XMQdZvlAAIKT7x5H/9vSxxxe3N7vHzymJzh8sejwpVF8bNuZddXyhAECi4VWXj1ndN354yiGJ6qe7r7/D5/zar/Guw/JlAgBpQmesvZNDEtVPdy/v3uVnvD0dXyYAkCZ0pnIHm33xcZU6Xe40CR0AmGXojJUT91Ln8gTRWAnmywQAgrp+Kteq+nk5sY/ueErncDj5+p46+2LXc/74MgGAoG4PC5eTefTC8aM7ndapDyevq5+fPsp6wPXe86XnvkwAgIFGWHXsrL5y5xBBi57vsuNTAAD0OsK6vrHhIXdOd995vdjnEToAQKA9nesrsO49bb3e5+ljZ8cnAAAYcHw17DPPvfwAwODjq/up0/1tBb34AMAA46t1g8eEdn+3HS8+ADBA6pQNHhP6WvwrdkIHAIibO4+UdnQAAIQOACB0AACEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AQOgAAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMACB0vAQAgdAAAhA4AgNABABA6AABCBwBA6AAAQgcAQOgAAAgdAAChAwAgdAAAhA4AIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOAIDQAQCEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AAKEDAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMAIHQAAKEDACB0AACEDgCA0AEAEDoAAEIHABA6AABCBwBA6AAACB0AAKEDACB0AAChAwAgdAAAhA4AgNABABA6AABCBwBA6AAAQgcAQOgAAAgdAAChAwAgdAAAhA4AIHQAAIQOAIDQAQAQOgAAQgcAQOgAAEIHAEDoAAAIHQAAoQMAIHQAAIQOACB0AACEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAhA4AgNABABA6AABCBwBA6AAACB0AQOgAAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQAQOgAAQgcAQOgAAAgdAAChAwAIHQAAoQMAIHQAAIQOAIDQAQAQOgCA0AEAEDoAAEIHAEDoAAAIHQAAoQMA4CUAAIQOAIDQAQAQOgAAQgcAQOgAAAgdAEDoAAAIHQAAoQMAIHQAAIQOAIDQAQCEDgCA0AEAEDoAAEIHAEDoAAAIHQBA6AAACB0AAKEDACB0AACEDgCA0AEAEDoAgNABABA6AABCBwBA6AAACB0AAKEDAAgdAAChAwAgdAAAhA4AgNABABA6AIDQAQAQOgAAQgcAQOgAAAgdAAChAwAgdAAAoQMAIHQAAIQOAIDQAQAQOgAAQgcAEDoAAEIHAEDoAAAIHQAAoQMAIHQAAKEDACB0AACEDgCA0AEAEDoAAEIHABA6AABCBwBA6AAACB0AAKEDACB0AACEDgAgdAAAhA4AgNABABA6AABCBwBA6AAAQgcAQOgAAAgdAAChAwAgdAAAhA4AIHQAAIQOAIDQAQAQOgAAQgcAQOgAAAgdAEDoAAAE9D/jyV7F2SdU7wAAAABJRU5ErkJggg==");opacity:0;transition:opacity .5s var(--ease) 1.3s;-webkit-mask:var(--dm) 0 0/100% 100% no-repeat;mask:var(--dm) 0 0/100% 100% no-repeat}
+.scene .photo.shut .l-drape{opacity:1;transition-delay:0s}
+.l-drape .dr{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0}
+/* ลอนจีบ --fa (ช่วงบน) / --fb (ช่วงล่าง ลอนเหลื่อมเล็กน้อย) สร้างใน drapeFolds(): กว้าง ลึก สว่างไม่เท่ากันทุกลอน */
+.l-drape .fab{position:absolute;inset:0;transform-origin:0 0;transform:scaleX(.206);transition:transform 1.9s cubic-bezier(.6,0,.2,1);
+  background:var(--fa,linear-gradient(90deg,#2c1d12,#77583f 14%,#5a3f2b 45%,#2c1d12) 0 0/calc(100% / 18) 100%)}
+.scene .photo.shut .l-drape .fab{transform:none}
+/* ขอบหน้าของม่าน (เห็นตอนกำลังเลื่อน) */
+.l-drape .fab::before{content:"";position:absolute;top:0;bottom:0;right:0;z-index:1;width:.9%;background:linear-gradient(90deg,rgba(18,11,5,0),rgba(18,11,5,.5) 72%,rgba(255,226,190,.22))}
+.l-drape .fab>b{position:absolute;inset:0;transition:opacity .7s var(--ease)}
+.l-drape .f-fb{background:var(--fb);-webkit-mask:linear-gradient(180deg,transparent 20%,#000 90%);mask:linear-gradient(180deg,transparent 20%,#000 90%)}
+/* ไฟซ่อนส่องหัวม่าน: สันลอนรับแสงมากกว่าร่อง (screen ลอนเดิมซ้ำ) แล้วจางลงราว 1 ใน 5 ของความสูง */
+.l-drape .f-cv{background:var(--fa);mix-blend-mode:screen;-webkit-mask:linear-gradient(180deg,#000,rgba(0,0,0,.6) 4%,rgba(0,0,0,.2) 10%,transparent 21%);mask:linear-gradient(180deg,#000,rgba(0,0,0,.6) 4%,rgba(0,0,0,.2) 10%,transparent 21%)}
+.l-drape .f-sh{background:
+    linear-gradient(180deg,rgba(255,236,212,.42),rgba(250,220,182,.2) 2.5%,rgba(240,200,158,0) 7%),
+    linear-gradient(180deg,rgba(24,15,8,0) 95.5%,rgba(24,15,8,.3) 98.4%,rgba(18,11,5,.55)),
+    radial-gradient(42% 48% at 0 84%,rgba(255,196,140,.18),rgba(255,196,140,0)),
+    linear-gradient(90deg,rgba(14,9,5,0) 35%,rgba(14,9,5,.14)),
+    linear-gradient(180deg,rgba(20,12,6,0) 12%,rgba(20,12,6,.12) 40%,rgba(20,12,6,.03) 88%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.3 .011' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .09 0 0 0 0 .055 0 0 0 0 .03 .85 0 0 0 -.36'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23f)'/%3E%3C/svg%3E") 0 0/220px 220px}
+.l-drape .f-wm{background:var(--wm);mix-blend-mode:multiply;opacity:var(--warm)}
+.l-drape .f-tn{background:var(--wb);mix-blend-mode:soft-light;opacity:var(--tint)}
+.l-drape .f-lf{background:radial-gradient(90% 80% at 10% 60%,var(--kc),rgba(255,255,255,.35));mix-blend-mode:soft-light;opacity:var(--lift)}
+.l-drape .f-dk{background:linear-gradient(180deg,#121d38,#0a1328);mix-blend-mode:multiply;opacity:var(--dark)}
+/* ตอนม่านกำลังปิด/เปิด (.swing ~2 วินาที) แสงในห้องค่อย ๆ เปลี่ยนตามผ้า ปิด = รอผ้าเลื่อนไปก่อน */
+.scene .photo.swing .cv>i:not(.l-drape){transition-duration:1.5s}
+.scene .photo.swing.shut .cv>i:not(.l-drape){transition-delay:.4s}
+/* โคมข้างเตียงและไฟซ่อนเรืองตามสีแสง (kHex) */
+.scene .l-glow{background:radial-gradient(6.5% 7% at 7.8% 55%,var(--kc),transparent),radial-gradient(4.6% 5.4% at 47% 52.3%,var(--kc),transparent),
+  radial-gradient(27% 3.2% at 25% 47%,var(--kc),transparent),radial-gradient(1.8% 13% at 51% 36%,var(--kc),transparent);mix-blend-mode:screen;opacity:var(--glow)}
+/* ไอกลิ่น: สายไอจากเครื่องพ่นกลิ่นบนโต๊ะกลมข้างหน้าต่าง ลอยขึ้นตัดกับกระจกระเบียงที่มืด เข้มตามระดับกลิ่น */
+.scene .l-mist{mix-blend-mode:screen;opacity:var(--mist)}
+.scene .l-mist b{position:absolute;left:69.8%;top:51.8%;width:1.7%;height:6.8%;border-radius:50%;transform-origin:50% 100%;
+  background:radial-gradient(closest-side,rgba(250,245,238,.95),rgba(250,245,238,.7) 35%,rgba(250,245,238,.25) 70%,transparent);
+  opacity:.7;animation:plume 5.4s cubic-bezier(.3,.6,.4,1) infinite}
+.scene .l-mist b:nth-child(2){animation-delay:-1.8s}
+.scene .l-mist b:nth-child(3){animation-delay:-3.6s}
+@keyframes plume{0%{opacity:0;transform:translate(0,30%) scale(.45,.35)}20%{opacity:1}100%{opacity:0;transform:translate(-30%,-62%) scale(1.6,1.25)}}
+.scene .live,.scene .air{position:absolute;display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;
+  background:rgba(11,21,41,.66);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-size:12px;color:#f4eae0;white-space:nowrap}
+.scene .live{right:12px;top:12px}
+.scene .air{left:12px;bottom:12px;font-family:var(--num);font-variant-numeric:tabular-nums}
+.scene .live i{width:6px;height:6px;border-radius:50%;background:#8fae90}
+
+/* ไทม์ไลน์ 5 ช่วงของคืน (แตะเพื่อสลับช่วง) */
+.phases{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.phases::before{content:"";position:absolute;left:10%;right:10%;top:19px;height:1px;background:var(--line-2)}
+.ph{appearance:none;position:relative;background:none;border:0;padding:0 2px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-width:0}
+.ph .dotc{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--bg-2);border:1px solid var(--line-2);color:var(--fg-2);transition:all .3s var(--ease)}
+.ph .dotc svg.i{width:18px;height:18px}
+.ph time{font-family:var(--num);font-size:11.5px;color:var(--fg-3);font-variant-numeric:tabular-nums;line-height:1.1}
+.ph span{font-size:12px;line-height:1.25;color:var(--fg-2)}
+.ph[aria-pressed="true"] .dotc{background:var(--btn-bg);color:var(--btn-fg);border-color:var(--btn-bg)}
+.ph[aria-pressed="true"] span{color:var(--fg);font-weight:400}
+
+/* ---------- ตัวปรับห้อง: แถวละ 1 ค่า ค่าตัวใหญ่ ปุ่ม −/+ ขนาดนิ้ว ---------- */
+.group{border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);overflow:hidden}
+.group-h{padding:16px 16px 8px}
+.gh-t{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.gh-t small{font-size:12.5px;color:var(--fg-3);white-space:nowrap}
+.g-note{font-size:13px;line-height:1.5;color:var(--fg-2);margin-top:4px}
+.ctl{display:flex;align-items:center;gap:8px;padding:9px 8px 9px 12px;min-height:70px;border-top:1px solid var(--line)}
+.ctl .lab{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;padding:6px 2px 6px 0;text-align:left;border-radius:14px}
+.ctl .ic{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--card-2);color:var(--fg)}
+.ctl .ic svg.i{width:19px;height:19px}
+.ctl .txt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.ctl .txt>span{display:flex;align-items:center;gap:1px;font-size:15px;font-weight:400;line-height:1.3;white-space:nowrap}
+.ctl .txt>span svg.i{width:13px;height:13px;color:var(--fg-3)}
+.ctl .txt small{font-size:12px;line-height:1.4;color:var(--fg-2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:.5px;background:var(--fg-4)}
+.dot.ok{background:var(--ok)}
+.dot.mid{background:var(--accent)}
+.dot.warn{background:var(--st-wake)}
+.qs{flex:none;display:grid;grid-template-columns:40px 60px 40px;align-items:center}
+.qs button{appearance:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:transparent;display:grid;place-items:center;
+  font-family:var(--num);font-size:20px;font-weight:300;line-height:1;color:var(--fg);transition:background .2s,opacity .2s}
+.qs button:active{background:var(--card-2)}
+.qs button:disabled{opacity:.25;cursor:default}
+.qs output{display:flex;flex-direction:column;align-items:center;font-family:var(--num);font-weight:300;font-size:21px;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap}
+.qs output small{font-size:10.5px;font-weight:400;line-height:1.2;color:var(--fg-3)}
+@media (max-width:359px){.ctl .ic{display:none}}
+.room-acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.room-acts .btn{padding:0 12px;gap:8px;white-space:nowrap}
+.note{font-size:12px;color:var(--fg-3);text-align:center}
+
+/* แถบเลื่อน */
+.range{-webkit-appearance:none;appearance:none;display:block;width:100%;height:34px;margin:0;background:transparent;--p:50%;--fill:var(--fg)}
+.range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--fill) 0 var(--p),var(--track) var(--p) 100%)}
+.range::-moz-range-track{height:6px;border-radius:3px;background:var(--track)}
+.range::-moz-range-progress{height:6px;border-radius:3px;background:var(--fill)}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-9px;border-radius:50%;border:0;background:var(--btn-bg);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.range::-moz-range-thumb{width:24px;height:24px;border-radius:50%;border:0;background:var(--btn-bg);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.range.k::-webkit-slider-runnable-track{background:var(--ktrack)}
+.range.k::-moz-range-track{background:var(--ktrack)}
+.range.k::-moz-range-progress{background:transparent}
+.range:disabled{opacity:.35}
+
+/* ปุ่มเพิ่ม/ลดตัวใหญ่ในแผ่นรายละเอียด */
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{appearance:none;width:48px;height:48px;border-radius:50%;border:1px solid var(--line-2);background:transparent;display:grid;place-items:center;font-size:22px;line-height:1}
+.stepper button:active{background:var(--card-2)}
+.stepper output{font-family:var(--num);font-weight:200;font-size:46px;min-width:136px;text-align:center;font-variant-numeric:tabular-nums}
+
+/* ตัวเลือกแบบปุ่มกลุ่ม */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--card-2)}
+.seg button{appearance:none;border:0;background:transparent;padding:8px 10px;border-radius:10px;font-size:13.5px;font-weight:400;color:var(--fg-3);transition:background .25s,color .25s}
+.seg button[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg)}
+
+/* สวิตช์ */
+.sw{appearance:none;flex:none;position:relative;width:50px;height:30px;border:0;border-radius:999px;background:var(--track);transition:background .25s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#f4eae0;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .25s var(--ease)}
+.sw[aria-checked="true"]{background:var(--sage)}
+.sw[aria-checked="true"]::after{transform:translateX(20px)}
+
+/* ---------- แผ่นรายละเอียด (bottom sheet) ---------- */
+.sheet-wrap{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;visibility:hidden;transition:visibility 0s .4s}
+.sheet-wrap.open{visibility:visible;transition:none}
+.scrim{position:absolute;inset:0;background:var(--scrim);opacity:0;transition:opacity .3s}
+.open .scrim{opacity:1}
+.sheet{position:relative;width:100%;max-width:560px;max-height:88%;overflow:auto;overscroll-behavior:contain;background:var(--sheet);color:var(--fg);
+  border:1px solid var(--line);border-bottom:0;border-radius:26px 26px 0 0;
+  padding:10px max(20px,env(safe-area-inset-right,0px)) calc(26px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));
+  transform:translateY(100%);transition:transform .4s var(--ease)}
+.open .sheet{transform:none}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line-2);margin:0 auto 14px}
+.sheet-h{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sheet-h .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card-2)}
+.sheet-h h3{flex:1;font-size:20px;font-weight:400}
+.x{appearance:none;width:38px;height:38px;border-radius:50%;border:0;background:var(--card-2);display:grid;place-items:center;color:var(--fg-2)}
+.field{padding:14px 0;border-top:1px solid var(--line)}
+.sheet-h+.field{border-top:0}
+.field.center{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.field-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px;font-size:14px;color:var(--fg-2)}
+.field-h b{font-family:var(--num);font-weight:400;color:var(--fg);font-variant-numeric:tabular-nums}
+.field .hint,.sheet>.hint,#sheet-body>.hint{font-size:12.5px;color:var(--fg-3);margin-top:6px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:4px}
+.opt{appearance:none;display:flex;flex-direction:column;gap:1px;padding:11px 14px;border-radius:14px;border:1px solid var(--line-2);background:transparent;text-align:left;font-size:14.5px;font-weight:400;transition:all .2s}
+.opt small{font-size:12px;font-weight:300;color:var(--fg-3)}
+.opt[aria-pressed="true"]{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-fg)}
+.opt[aria-pressed="true"] small{color:inherit;opacity:.68}
+.row-sw{display:flex;align-items:center;gap:14px}
+.row-sw>div{flex:1;min-width:0}
+.row-sw small{display:block;font-size:12.5px;color:var(--fg-3)}
+.sched{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.sched div{padding:10px 12px;border-radius:12px;background:var(--card-2);font-size:12px;color:var(--fg-3)}
+.sched b{display:block;font-family:var(--num);font-weight:400;font-size:17px;color:var(--fg)}
+.tscale{align-self:stretch;margin-top:16px;text-align:left}
+.tbar{position:relative;height:8px;border-radius:4px;background:var(--track)}
+.tbar .band{position:absolute;top:0;bottom:0;left:33.333%;width:33.333%;border-radius:4px;background:var(--ok);opacity:.55}
+.tbar i{position:absolute;top:50%;left:33.333%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--btn-bg);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:left .3s var(--ease)}
+.tlab{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-family:var(--num);font-size:12px;color:var(--fg-3)}
+.tlab span:nth-child(2){color:var(--ok)}
+.band-t{margin-top:10px;font-size:14px;color:var(--fg-2)}
+.band-t.ok{color:var(--ok)}
+.band-t.warn{color:var(--st-wake)}
+.why b{display:block;font-weight:400;font-size:14.5px;margin-bottom:4px}
+.why p{font-size:13.5px;line-height:1.6;color:var(--fg-2)}
+.lbl{display:block;font-size:14px;color:var(--fg-2);margin-bottom:8px}
+.inp{width:100%;height:52px;padding:0 16px;border-radius:14px;border:1px solid var(--line-2);background:transparent;font-family:var(--num);font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.inp:focus{outline:none;border-color:var(--accent)}
+.inp.txt{font-family:var(--th);letter-spacing:0;text-transform:none}
+.inp.area{height:auto;min-height:76px;padding:12px 16px;line-height:1.5;resize:vertical;font-family:var(--th);letter-spacing:0;text-transform:none}
+.inp::placeholder{color:var(--fg-4);text-transform:none;letter-spacing:0}
+.err{color:var(--earth-hi);font-size:13px;margin-top:8px}
+.err:empty{display:none}
+body.day .err{color:var(--earth)}
+.sheet .btn{margin-top:16px}
+
+@media (min-width:860px){
+  .grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:26px;align-items:start}
+  .stack{gap:16px}
+  .sheet-wrap{align-items:center}
+  .sheet{border-radius:26px;border-bottom:1px solid var(--line);max-height:84%;padding-bottom:26px;opacity:0;transform:translateY(18px);transition:transform .3s var(--ease),opacity .25s}
+  .open .sheet{opacity:1;transform:none}
+  .grab{display:none}
+}
+
+/* ---------- ผลการนอน ---------- */
+.card{border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);padding:18px}
+.card-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin-bottom:12px}
+.card-h small{font-size:12.5px;color:var(--fg-3)}
+.score{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.ring{position:relative;width:168px;height:168px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .trk{stroke:var(--track)}
+.ring .bar{stroke:var(--ok);stroke-linecap:round;transition:stroke-dashoffset 1.6s var(--ease)}
+.ring .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .v b{font-family:var(--num);font-weight:200;font-size:54px;line-height:1;font-variant-numeric:tabular-nums}
+.ring .v small{font-family:var(--num);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--fg-3);margin-top:6px}
+.grade{display:inline-flex;padding:4px 12px;border-radius:999px;background:var(--ok-bg);color:var(--ok);font-size:13px;font-weight:400}
+.score p{color:var(--fg-2);max-width:26em}
+.metrics{list-style:none;margin:0;padding:0;width:100%;text-align:left}
+.metrics li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;color:var(--fg-2)}
+.metrics b{font-family:var(--num);font-weight:400;color:var(--fg);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.hyp{position:relative;min-height:190px}
+.hyp svg{display:block;width:100%}
+.hyp text{font-family:var(--th);font-size:11.5px;fill:var(--fg-3)}
+.hyp .tick{font-family:var(--num);font-variant-numeric:tabular-nums}
+.hyp .grid-l{stroke:var(--line);stroke-width:1}
+.hyp .conn{stroke:var(--line-2);stroke-width:1}
+.legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.legend div{display:flex;flex-direction:column;gap:1px;font-size:12px;color:var(--fg-3);min-width:0}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:0}
+.legend b{font-family:var(--num);font-weight:400;font-size:16px;color:var(--fg);font-variant-numeric:tabular-nums}
+
+.vitals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.vital{padding:14px;border-radius:var(--r-md);background:var(--card);border:1px solid var(--line);min-width:0}
+.vital svg.i{color:var(--fg-3);width:18px;height:18px}
+.vital small{display:block;font-size:12px;color:var(--fg-3);margin-top:8px}
+.vital b{font-family:var(--num);font-weight:300;font-size:25px;line-height:1.15;font-variant-numeric:tabular-nums}
+.vital span{font-size:12px;color:var(--fg-3);margin-left:3px}
+
+.log{list-style:none;margin:0;padding:0}
+.log li{position:relative;display:grid;grid-template-columns:48px 12px minmax(0,1fr);gap:10px;padding:8px 0}
+.log li::before{content:"";position:absolute;left:63px;top:22px;bottom:-8px;width:1px;background:var(--line-2)}
+.log li:last-child::before{display:none}
+.log time{font-family:var(--num);font-size:13px;color:var(--fg-2);font-variant-numeric:tabular-nums;padding-top:1px}
+.log .d{width:11px;height:11px;border-radius:50%;margin-top:6px;border:2px solid var(--bg);box-shadow:0 0 0 1px var(--line-2);background:var(--fg-4)}
+.log .d.on{background:var(--ok)}
+.log .d.alert{background:var(--st-wake)}
+.log p{font-size:14px}
+.log p small{display:block;font-size:12.5px;color:var(--fg-3)}
+
+.insight{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:16px 18px;border-radius:var(--r-md);background:var(--card);border:1px solid var(--line)}
+.insight .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card-2);color:var(--accent)}
+.insight p{font-size:14px;color:var(--fg-2)}
+.insight h3{font-size:15.5px;margin-bottom:3px}
+.disclaim{font-size:12px;color:var(--fg-3);text-align:center;max-width:36em;margin:4px auto 0}
+/* เสียงกรน (หน้าผล) */
+.sn-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sn-stats div{padding:10px 12px;border-radius:12px;background:var(--card-2);min-width:0}
+.sn-stats b{font-family:var(--num);font-weight:300;font-size:22px;line-height:1.2;font-variant-numeric:tabular-nums}
+.sn-stats span{font-size:12px;color:var(--fg-3);margin-left:3px}
+.sn-stats small{display:block;font-size:12px;line-height:1.45;color:var(--fg-3)}
+.sn-stats small:first-of-type{margin-top:2px}
+.sn-line{margin-top:12px}
+.sn-line svg{display:block;width:100%}
+.sn-line text{font-family:var(--num);font-size:11px;fill:var(--fg-3)}
+.sn-tip{margin-top:10px;font-size:13.5px;line-height:1.6;color:var(--fg-2)}
+.sn-line .trk{fill:var(--track)}
+.sn-line .off{fill:none;stroke:var(--line-2);stroke-dasharray:2 3}
+.sn-line .hit{fill:var(--earth)}
+.sn-short{margin-top:10px;font-size:13px;color:var(--accent)}
+.sc-adj{font-size:12.5px;line-height:1.55;color:var(--fg-3);text-align:left;width:100%}
+.sc-adj b{color:var(--accent);font-weight:400}
+.rec-sn{display:flex;gap:8px;align-items:baseline;font-size:13.5px;color:var(--fg-2);padding:9px 12px;border-radius:12px;background:var(--card-2);overflow-wrap:anywhere}
+.rec-sn b{flex:none;font-weight:400;color:var(--fg)}
+.rec-trend{font-size:13px;line-height:1.5;color:var(--accent);padding:0 2px}
+
+/* ---------- แผนกลับบ้าน ---------- */
+.loop{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:16px}
+.loop div{position:relative;padding:10px 10px 9px;border-radius:12px;background:var(--card-2);font-size:12px;color:var(--fg-3);min-width:0}
+.loop b{display:block;font-weight:400;font-size:13.5px;color:var(--fg)}
+.loop .done b::after{content:" ✓";color:var(--ok)}
+.loop .now{background:var(--btn-bg);color:var(--btn-fg)}
+.loop .now b{color:var(--btn-fg)}
+.loop .now small{opacity:.7}
+.els{display:flex;flex-direction:column}
+.el{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.el:first-child{border-top:0;padding-top:4px}
+.el .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card-2)}
+.el small{display:block;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-family:var(--num);color:var(--accent)}
+.el b{display:block;font-weight:400;font-size:15.5px;margin-top:1px}
+.el p{font-size:13px;color:var(--fg-3);margin-top:3px}
+.routine{list-style:none;margin:6px 0 0;padding:0}
+.routine li{display:grid;grid-template-columns:54px minmax(0,1fr);gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.routine li:first-child{border-top:0}
+.routine time{font-family:var(--num);font-size:14px;font-variant-numeric:tabular-nums;color:var(--fg)}
+.routine p{font-size:14px}
+.routine p small{display:block;font-size:12.5px;color:var(--fg-3)}
+.kit{display:flex;flex-direction:column;gap:10px}
+.kit-i{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center;padding:14px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--card)}
+.kit-i .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--card-2)}
+.kit-i .ic svg.i{width:24px;height:24px}
+.kit-i b{display:block;font-weight:400;font-size:15px}
+.kit-i p{font-size:13px;color:var(--fg-3)}
+.designer{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;align-items:center}
+.designer .av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--sage);color:#f4eae0;font-family:var(--num);font-size:16px}
+.designer p{font-size:13.5px;color:var(--fg-2)}
+.actions{display:grid;grid-template-columns:1fr;gap:10px}
+.proto{font-size:11.5px;color:var(--fg-4);text-align:center;margin-top:6px}
+
+/* ---------- บันทึกค่าห้องรายคน ---------- */
+.sum{margin:0}
+.sum div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45}
+.sum div:first-child{border-top:0;padding-top:2px}
+.sum dt{color:var(--fg-3)}
+.sum dd{margin:0;color:var(--fg);min-width:0;overflow-wrap:anywhere}
+.sync{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--fg-3)}
+.sync::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--fg-4)}
+.sync.live::before{background:var(--ok)}
+.sync.warn::before{background:var(--st-wake)}
+.recs{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:16px;align-items:start}
+.rec{display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--line);min-width:0}
+.rec-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rec-who{min-width:0}
+.rec-n{display:block;font-size:18px;font-weight:400;line-height:1.3;overflow-wrap:anywhere}
+.rec-h small{display:block;font-size:12.5px;color:var(--fg-3);margin-top:2px}
+.rec-h small.num{letter-spacing:.04em}
+.score-b{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:2px solid var(--ok);font-family:var(--num);font-size:17px;font-variant-numeric:tabular-nums}
+.rec-note{font-size:13.5px;color:var(--fg-2);padding:10px 12px;border-radius:12px;background:var(--card-2);overflow-wrap:anywhere}
+.rec-acts{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.btn.sm{min-height:46px;font-size:14.5px;padding:0 18px}
+.btn.danger{border-color:var(--st-wake);color:var(--st-wake)}
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:34px 22px;text-align:center;border-radius:var(--r-lg);border:1px dashed var(--line-2)}
+.empty .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--card-2);margin-bottom:4px}
+.empty b{font-weight:400;font-size:17px}
+.empty p{font-size:14px;color:var(--fg-2);max-width:28em}
+.empty .btn{width:auto;margin-top:8px}
+
+/* ---------- โหมดหลับ ---------- */
+.sleep{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;
+  background:#070e1d;color:rgba(244,234,224,.74);
+  padding:calc(40px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(26px + env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px));
+  opacity:0;visibility:hidden;transition:opacity 1s,visibility 1s}
+.sleep.on{opacity:1;visibility:visible}
+.sleep .eyebrow{color:rgba(217,198,173,.7)}
+.sleep .clock{font-family:var(--num);font-weight:200;font-size:clamp(68px,21vw,128px);line-height:1;letter-spacing:.02em;color:rgba(244,234,224,.66);margin-top:10px;font-variant-numeric:tabular-nums}
+.sleep .sub{font-size:14px;color:rgba(244,234,224,.5);margin-top:10px}
+.breath{position:relative;width:min(220px,58vw);aspect-ratio:1;display:grid;place-items:center}
+.orb{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(244,234,224,.2);background:radial-gradient(circle,rgba(109,141,110,.26),rgba(109,141,110,.04) 68%,transparent 70%);
+  transform:scale(.56);transition:transform 4s ease-in-out}
+.orb.in{transform:scale(1);transition-duration:4s}
+.orb.hold{transform:scale(1)}
+.orb.out{transform:scale(.56);transition-duration:8s}
+.breath p{position:relative;font-size:16px;color:rgba(244,234,224,.78)}
+.breath p small{display:block;font-family:var(--num);font-size:12px;color:rgba(244,234,224,.45);margin-top:2px}
+.sleep .acts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px}
+.sleep .btn{background:rgba(244,234,224,.1);color:rgba(244,234,224,.86)}
+.sleep .btn.ghost{background:transparent;border-color:rgba(244,234,224,.18)}
+
+/* โหมดหลับ: เตือนชาร์จแบต + วัดเสียงในห้อง (สีหม่น ไม่รบกวนการนอน) */
+.batt{display:inline-flex;align-items:center;gap:8px;max-width:340px;margin-top:14px;padding:7px 14px;border-radius:16px;font-size:13px;line-height:1.4;text-align:left;
+  border:1px solid rgba(244,234,224,.14);color:rgba(244,234,224,.7)}
+.batt:empty{display:none}
+.batt svg.i{width:18px;height:18px}
+.batt.warn{border-color:rgba(194,122,78,.45);color:rgba(226,167,127,.85)}
+.batt.ok{border-color:rgba(143,174,144,.4);color:#a9c4aa}
+.mon{width:100%;max-width:380px;padding:12px 14px 10px;border-radius:18px;border:1px solid rgba(244,234,224,.12);background:rgba(244,234,224,.04);text-align:left}
+.mon-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mon-h b{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:400;color:rgba(244,234,224,.82)}
+.mon-h b svg.i{width:16px;height:16px}
+.mon-h small{font-size:11.5px;color:rgba(244,234,224,.5);text-align:right}
+.mon-h small.real{color:#a9c4aa}
+.mon-bars{display:flex;align-items:flex-end;gap:2px;height:34px;margin:10px 0 7px}
+.mon-bars i{flex:1;min-width:0;height:6%;border-radius:2px;background:rgba(244,234,224,.24)}
+.mon-bars i.sn{background:#c27a4e}
+.mon-f{display:flex;justify-content:space-between;gap:10px;font-family:var(--num);font-size:13px;color:rgba(244,234,224,.74);font-variant-numeric:tabular-nums}
+.mon-note{margin-top:4px;font-size:11.5px;line-height:1.45;color:rgba(244,234,224,.42)}
+.mon-h small.demo{color:rgba(217,198,173,.78)}
+.mon-b{display:flex;align-items:flex-end;gap:10px;margin-top:4px}
+.mon-b .mon-note{flex:1;min-width:0;margin:0}
+.mon-t{flex:none;padding:6px 12px;min-height:32px;border-radius:999px;border:1px solid rgba(244,234,224,.16);background:transparent;
+  color:rgba(244,234,224,.62);font:inherit;font-size:12.5px;cursor:pointer}
+.mon.paused .mon-bars,.mon.paused .mon-f{opacity:.4}
+.pre-batt{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px}
+.pre-batt svg.i{width:15px;height:15px;flex:none}
+.sleep{overflow-y:auto}
+@media (max-height:900px){.breath{width:min(176px,46vw)}.sleep .clock{font-size:clamp(60px,18vw,112px)}.sleep{padding-top:calc(28px + env(safe-area-inset-top,0px))}}
+@media (max-height:760px){.breath{width:min(160px,44vw)}.sleep .clock{font-size:clamp(54px,16vw,100px)}.breath p{font-size:14px}}
+
+/* เช้า: เปลี่ยนจากกรมท่าเป็นเบจ */
+.dawn{position:fixed;inset:0;z-index:60;display:grid;place-items:center;text-align:center;padding:24px;
+  background:linear-gradient(180deg,#070e1d 0%,#101d38 30%,#6b4a49 55%,#c27a4e 72%,#f4eae0 100%);background-size:100% 320%;background-position:0 0;
+  opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}
+.dawn.on{opacity:1;visibility:visible;animation:sunrise 2.8s var(--ease) forwards}
+@keyframes sunrise{to{background-position:0 100%}}
+.dawn div{opacity:0;color:#101d38;transition:opacity .8s 1.5s}
+.dawn.on div{opacity:1}
+.dawn .hand{font-size:24px;color:#9c5330}
+.dawn h2{font-size:34px}
+
+/* ข้อความแจ้ง */
+.toast{position:fixed;left:50%;z-index:70;bottom:calc(var(--bar-h) + 22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;
+  max-width:calc(100% - 32px);padding:12px 18px;border-radius:16px;background:var(--btn-bg);color:var(--btn-fg);font-size:14px;font-weight:400;text-align:center;
+  pointer-events:none;transition:opacity .3s,transform .3s var(--ease)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (min-width:600px){.actions{grid-template-columns:1fr 1fr}}
+@media (min-width:860px){
+  .recs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .els{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+  .el{grid-template-columns:1fr;gap:10px;padding:16px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--card)}
+  .el:first-child{padding-top:16px;border:1px solid var(--line)}
+  .toast{bottom:34px}
+}
+@media (min-width:1240px){
+  .score{flex-direction:row;align-items:center;text-align:left;gap:26px}
+  .score .meta{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+</style>
+<div class="sky" aria-hidden="true">
+  <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+    <path d="M0 120 C 90 70, 170 150, 260 105 S 360 70, 400 92" stroke-width="1.1"/>
+    <path d="M0 150 C 110 110, 200 175, 290 140 S 370 118, 400 130" stroke-width=".7"/>
+  </svg>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <mask id="m-logo"><rect width="120" height="64" fill="#fff"/><circle cx="81" cy="12.5" r="12.6" fill="#000"/></mask>
+    <symbol id="logo" viewBox="0 0 120 64">
+      <circle cx="76" cy="18" r="13" fill="currentColor" mask="url(#m-logo)"/>
+      <path d="M3 47 C 21 34, 43 27.5, 61 34.5 C 75 40, 86 49.5, 117 49.6 C 88 52.6, 75 45.5, 60.5 38.6 C 43 31.6, 23 36.5, 3 47 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z"/><path d="M17.5 3v3.2M15.9 4.6h3.2"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/><path d="M6 12.5h3l1.5-2.5 2.5 5 1.5-2.5H18"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4.5 20 11v8.5a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.8"/><path d="M12 2.8v2M12 19.2v2M4.6 4.6 6 6M18 18l1.4 1.4M2.8 12h2M19.2 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M3 12h1.6M6.8 9v6M10.4 5.5v13M14 8.5v7M17.6 10.5v3M21 12h-1.2"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19.5c0-8.2 6-13.2 14.5-14-1 8.4-6 14-14.5 14z"/><path d="M5 19.5l8-8"/></symbol>
+    <symbol id="i-temp" viewBox="0 0 24 24"><path d="M12 3.5a2 2 0 0 0-2 2v8.7a4 4 0 1 0 4 0V5.5a2 2 0 0 0-2-2z"/><path d="M12 10.5v6"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18.5v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 15.5h18M6 10.5V8a1 1 0 0 1 1-1h3.5v3.5M13.5 10.5V7H17a1 1 0 0 1 1 1v2.5"/></symbol>
+    <symbol id="i-lotus" viewBox="0 0 24 24"><path d="M12 18.5c-3.6 0-6.5-2.4-7.5-5.5 2.6-.4 5.4.6 7.5 3 2.1-2.4 4.9-3.4 7.5-3-1 3.1-3.9 5.5-7.5 5.5z"/><path d="M12 16c-1.6-1.8-2.2-4.6-1.2-7.5L12 6l1.2 2.5c1 2.9.4 5.7-1.2 7.5z"/></symbol>
+    <symbol id="i-sunrise" viewBox="0 0 24 24"><path d="M3 18.5h18M6.8 18.5a5.2 5.2 0 0 1 10.4 0M12 7v3M5.4 10.4l1.8 1.8M18.6 10.4l-1.8 1.8M9.6 5 12 3l2.4 2"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M5 19.5v-6M9.7 19.5v-11M14.3 19.5v-8M19 19.5v-14"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13.5 6.5 19 12l-5.5 5.5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7.5h9.5M17.5 7.5H20M4 16.5h3.5M11.5 16.5H20"/><circle cx="15.5" cy="7.5" r="2"/><circle cx="9.5" cy="16.5" r="2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/></symbol>
+    <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 9h10.5a3 3 0 1 0-3-3M3 15h14a3 3 0 1 1-3 3M3 12h6"/></symbol>
+    <symbol id="i-move" viewBox="0 0 24 24"><path d="M3 12h4l2.2-5 4.6 10 2.2-5h5"/></symbol>
+    <symbol id="i-cycle" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 0 1-13 5.1M4.5 12a7.5 7.5 0 0 1 13-5.1"/><path d="M17.8 3.5v3.6h-3.6M6.2 20.5v-3.6h3.6"/></symbol>
+    <symbol id="i-lamp" viewBox="0 0 24 24"><path d="M8 3.5h8l3 8H5z"/><path d="M12 11.5v7.5M8 20.5h8"/></symbol>
+    <symbol id="i-diffuser" viewBox="0 0 24 24"><path d="M7 20.5h10a1 1 0 0 0 1-1v-4a6 6 0 0 0-12 0v4a1 1 0 0 0 1 1z"/><path d="M10 7c0-1.2 1-1.6 1-2.8M14 7c0-1.2 1-1.6 1-2.8"/></symbol>
+    <symbol id="i-bottle" viewBox="0 0 24 24"><path d="M10 3.5h4v3l2 2v11a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-11l2-2z"/><path d="M8 13h8"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17L12 16.5l-5.5 4z"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5 13.6 9l5.4 1.6-5.4 1.6L12 17.7l-1.6-5.5L5 10.6 10.4 9z"/><path d="M18.5 16.5l.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6z"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></symbol>
+    <symbol id="i-batt" viewBox="0 0 24 24"><rect x="3" y="7.5" width="16" height="9" rx="2.2"/><path d="M21 10.5v3M11.6 9.3l-2 3h3l-2 3"/></symbol>
+  </defs>
+</svg>
+
+<div class="shell">
+  <aside class="rail" aria-label="เมนูหลัก">
+    <div class="brand"><svg aria-hidden="true"><use href="#logo"/></svg><div><b>KUENDEE</b><small>Sleep Lab</small></div></div>
+    <nav role="tablist" aria-label="หน้าหลัก">
+      <button class="tab" role="tab" type="button" data-tab="room" aria-selected="true"><svg class="i" aria-hidden="true"><use href="#i-moon"/></svg>คืนนี้</button>
+      <button class="tab" role="tab" type="button" data-tab="report" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-chart"/></svg>ผลการนอน</button>
+      <button class="tab" role="tab" type="button" data-tab="plan" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-home"/></svg>แผนกลับบ้าน</button>
+      <button class="tab" role="tab" type="button" data-tab="saved" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-save"/></svg>บันทึก</button>
+    </nav>
+    <div class="room"><span class="chip"><span class="dot"></span>ห้อง 03 เชื่อมต่อแล้ว</span><b id="rail-tone">Calm Navy Room</b><span class="num" id="rail-code">KD-AB-T24-L0-BN45-WL</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div class="brand"><svg aria-hidden="true"><use href="#logo"/></svg><div><b>KUENDEE</b><small>Sleep Lab</small></div></div>
+      <span class="chip"><span class="dot"></span>ห้อง 03</span>
+    </header>
+
+    <!-- คืนนี้: ห้องและตัวควบคุม -->
+    <section class="view on" id="v-room" aria-label="คืนนี้">
+      <div class="greet-row">
+        <span class="eyebrow" id="g-eyebrow">The Overthinker · หัวยังไม่หยุด</span>
+        <h1 id="g-title">ห้องนี้ออกแบบมาเพื่อคุณ</h1>
+        <div class="tags">
+          <button class="tag" type="button" id="preset-tag" aria-label="เปลี่ยน Preset จากผลประเมิน"><svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg>Preset <b id="preset-code">KD-AB-T24-L0-BN45-WL</b></button>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="stack">
+          <div class="scene">
+            <div class="photo" role="img" aria-label="ห้อง Sleep Lab ของคืนดี ความสว่าง สีของแสง ผ้าม่าน กลิ่น และวิวหน้าต่างเปลี่ยนตามค่าที่ตั้งและช่วงเวลา">
+              <div class="cv">
+                <img src="room.jpg" alt="" width="1140" height="912" decoding="async">
+                <i class="l-warm"></i><i class="l-tint"></i><i class="l-lift"></i><i class="l-dark"></i><i class="l-shut"></i>
+                <i class="l-sky"></i><i class="l-land"></i><i class="l-sun"></i><i class="l-moon"></i>
+                <i class="l-drape"><b class="dr"><b class="fab"><b class="f-fb"></b><b class="f-cv"></b><b class="f-sh"></b><b class="f-wm"></b><b class="f-tn"></b><b class="f-lf"></b><b class="f-dk"></b></b></b></i><i class="l-glow"></i>
+                <i class="l-mist"><b></b><b></b><b></b></i>
+              </div>
+            </div>
+            <span class="live"><i></i>ห้อง 03 · สด</span>
+            <span class="air" id="air">ความชื้น 55% · CO₂ 620 ppm</span>
+          </div>
+          <div class="phases" id="phases" role="group" aria-label="ช่วงของค่ำคืน"></div>
+        </div>
+        <div class="stack">
+          <div class="group" id="controls">
+            <div class="group-h">
+              <div class="gh-t"><h3>ปรับห้อง</h3><small id="ctl-phase"></small></div>
+              <p class="g-note" id="g-lead"></p>
+            </div>
+            <div id="ctl-rows"></div>
+          </div>
+          <div class="room-acts">
+            <button class="btn ghost" type="button" id="save-room"><svg class="i" aria-hidden="true"><use href="#i-save"/></svg>บันทึกค่าห้อง</button>
+            <button class="btn" type="button" data-begin>เริ่มค่ำคืน <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+          <p class="note" id="cta-note"></p>
+          <p class="note pre-batt"><svg class="i" aria-hidden="true"><use href="#i-batt"/></svg>เริ่มค่ำคืนแล้วแอปจะฟังเสียงกรนทั้งคืน เสียบชาร์จมือถือไว้ด้วย</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ผลการนอน (ธีมเช้า) -->
+    <section class="view" id="v-report" aria-label="ผลการนอน">
+      <span class="eyebrow">Sleep analysis</span>
+      <h2>เช้านี้ร่างกายคุณได้พักเต็มที่</h2>
+      <p class="lead">คืนวันเสาร์ที่ 7 พ.ย. · ห้อง 03 · 23:00–07:00</p>
+      <div class="grid">
+        <div class="stack">
+          <div class="card score">
+            <div class="ring">
+              <svg viewBox="0 0 140 140" aria-hidden="true"><circle class="trk" cx="70" cy="70" r="60"/><circle class="bar" id="ring-bar" cx="70" cy="70" r="60"/></svg>
+              <div class="v"><b id="score-n">92</b><small>Sleep score</small></div>
+            </div>
+            <div class="meta">
+              <span class="grade" id="grade">ดีมาก</span>
+              <p>หลับลึกต่อเนื่องในช่วงแรกของคืน และตื่นตอนหลับตื้นพอดีกับแสงอรุณ</p>
+              <ul class="metrics">
+                <li>เวลาหลับจริง <b>7 ชม. 31 นาที</b></li>
+                <li>ประสิทธิภาพการนอน <b>94%</b></li>
+                <li>ใช้เวลาก่อนหลับ <b>12 นาที</b></li>
+                <li>ตื่นกลางดึก <b>1 ครั้ง · 9 นาที</b></li>
+              </ul>
+              <p class="sc-adj" id="score-adj"></p>
+            </div>
+          </div>
+          <div class="vitals">
+            <div class="vital"><svg class="i" aria-hidden="true"><use href="#i-heart"/></svg><small>ชีพจรขณะพัก</small><b>56</b><span>bpm</span></div>
+            <div class="vital"><svg class="i" aria-hidden="true"><use href="#i-wind"/></svg><small>การหายใจ</small><b>14</b><span>ครั้ง/นาที</span></div>
+            <div class="vital"><svg class="i" aria-hidden="true"><use href="#i-move"/></svg><small>ขยับตัว</small><b>8</b><span>ครั้ง</span></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>ห้องดูแลคุณอย่างไรเมื่อคืน</h3><small>ปรับเอง 7 ครั้ง</small></div>
+            <ol class="log" id="log"></ol>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <div class="card-h"><h3>ช่วงการนอน</h3><small>23:00–07:00</small></div>
+            <div class="hyp" id="hyp" role="img" aria-label="กราฟช่วงการนอนตลอดคืน: หลับลึก 4 ช่วง ส่วนใหญ่ก่อนตีสอง ตื่นกลางดึก 1 ครั้งตอน 03:40"></div>
+            <div class="legend" id="legend"></div>
+          </div>
+          <div class="card" id="snore">
+            <div class="card-h"><h3>เสียงกรน</h3><small id="sn-src">ข้อมูลตัวอย่าง</small></div>
+            <div class="sn-stats" id="sn-stats"></div>
+            <div class="sn-line" id="sn-line" role="img"></div>
+            <p class="sn-tip" id="sn-tip"></p>
+          </div>
+          <div class="insight"><div class="ic"><svg class="i" aria-hidden="true"><use href="#i-temp"/></svg></div><div><h3>หลับลึกดีที่สุดตอนห้อง 24°C</h3><p>หลับลึก 60 จาก 81 นาทีเกิดก่อน 02:00 ที่บ้านตั้งแอร์ 24°C แล้วให้ขึ้นเองช่วงดึก</p></div></div>
+          <div class="insight"><div class="ic"><svg class="i" aria-hidden="true"><use href="#i-sound"/></svg></div><div><h3>เสียงรถตอน 03:40 ทำให้ตื่น 9 นาที</h3><p>ห้องเพิ่ม Brown noise เป็น 48 dB(A) แล้วคุณหลับต่อได้ ที่บ้านเปิด Brown noise 45 dB(A) ทั้งคืน</p></div></div>
+          <div class="insight"><div class="ic"><svg class="i" aria-hidden="true"><use href="#i-sunrise"/></svg></div><div><h3>ตื่นตอนหลับตื้น จึงไม่งัวเงีย</h3><p>แสงอรุณเริ่ม 06:30 และพาคุณตื่นเองตอน 06:52 ก่อนนาฬิกาปลุก</p></div></div>
+          <div class="actions">
+            <button class="btn" type="button" id="save-report"><svg class="i" aria-hidden="true"><use href="#i-save"/></svg>บันทึกผลลงโปรไฟล์</button>
+            <button class="btn ghost" type="button" data-go="plan">ดูแผนกลับบ้าน <svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+          <p class="disclaim">ผลนี้ใช้ดูแลสุขภาวะการนอน ไม่ใช่การวินิจฉัยทางการแพทย์ ถ้านอนกรนหนักหรือมีช่วงหยุดหายใจ ควรพบแพทย์</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- แผนกลับบ้าน (ธีมเช้า) -->
+    <section class="view" id="v-plan" aria-label="แผนกลับบ้าน">
+      <span class="eyebrow">Take it home</span>
+      <h2>พาค่ำคืนที่ดีกลับบ้าน</h2>
+      <p class="lead" id="plan-lead"></p>
+      <div class="loop" aria-label="วงจรออกแบบการนอน">
+        <div class="done"><b>วัดผล</b><small>Measure</small></div>
+        <div class="done"><b>ออกแบบ</b><small>Design</small></div>
+        <div class="now"><b>ทบทวน</b><small>วันนี้ 09:30</small></div>
+        <div><b>ปรับใหม่</b><small>คืนถัดไป</small></div>
+      </div>
+      <div class="sec-h"><span class="eyebrow">Light · Sound · Scent · Temp · Bed</span><h3>5 อย่างที่ช่วยให้คุณหลับดี</h3></div>
+      <div class="els" id="els"></div>
+      <div class="grid">
+        <div class="stack">
+          <div class="card">
+            <div class="card-h"><h3>คืนนี้ที่บ้าน</h3><small id="routine-note"></small></div>
+            <div class="seg" id="plan-ab" role="group" aria-label="เลือกแผน">
+              <button type="button" data-ab="A" aria-pressed="true">แผน A · คืนปกติ</button>
+              <button type="button" data-ab="B" aria-pressed="false">แผน B · คืนที่กลับดึก</button>
+            </div>
+            <ol class="routine" id="routine"></ol>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <div class="card-h"><h3>Sleep Kit ที่เข้ากับคุณ</h3><small>ค่าเดียวกับห้องเมื่อคืน</small></div>
+            <div class="kit" id="kit"></div>
+          </div>
+          <div class="card designer">
+            <div class="av">ND</div>
+            <div><h3>ทบทวนกับ Night Designer</h3><p>วันนี้ 09:30 ที่ Consult Room ดูผลคืนนี้ด้วยกัน แล้วปรับแผนสำหรับคืนถัดไป</p></div>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" id="save-plan"><svg class="i" aria-hidden="true"><use href="#i-save"/></svg>บันทึกแผน</button>
+            <button class="btn ghost" type="button" id="book"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg>จองคืนถัดไป</button>
+          </div>
+          <p class="proto">ต้นแบบแอป KUENDEE Sleep Lab · ข้อมูลการนอนในแอปนี้เป็นตัวอย่าง</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- บันทึกค่าห้องรายคน (ธีมเช้า) -->
+    <section class="view" id="v-saved" aria-label="บันทึกค่าห้อง">
+      <span class="eyebrow">Sleep profiles</span>
+      <h2>ค่าห้องที่เหมาะกับแต่ละคน</h2>
+      <p class="lead">บันทึกจากคืนที่นอนในห้อง Sleep Lab ทีม Night Designer ใช้ตั้งห้องให้ในคืนถัดไป แตะ "ใช้ค่านี้ตั้งห้อง" เพื่อเรียกค่ากลับมา</p>
+      <p class="sync" id="sync" role="status"></p>
+      <div class="recs" id="recs"></div>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="หน้าหลัก">
+    <button class="tab" role="tab" type="button" data-tab="room" aria-selected="true"><svg class="i" aria-hidden="true"><use href="#i-moon"/></svg>คืนนี้</button>
+    <button class="tab" role="tab" type="button" data-tab="report" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-chart"/></svg>ผลการนอน</button>
+    <button class="tab" role="tab" type="button" data-tab="plan" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-home"/></svg>แผนกลับบ้าน</button>
+    <button class="tab" role="tab" type="button" data-tab="saved" aria-selected="false"><svg class="i" aria-hidden="true"><use href="#i-save"/></svg>บันทึก</button>
+  </nav>
+</div>
+
+<div class="sheet-wrap" id="sheet" aria-hidden="true">
+  <div class="scrim" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="grab"></div><div id="sheet-body"></div></div>
+</div>
+
+<div class="sleep" id="sleep" role="dialog" aria-modal="true" aria-label="โหมดหลับ" aria-hidden="true">
+  <div>
+    <span class="eyebrow">Good night</span>
+    <div class="clock" id="clock">23:00</div>
+    <p class="sub" id="sleep-sub"></p>
+    <p class="batt" id="batt" role="status"></p>
+  </div>
+  <div class="breath"><div class="orb" id="orb"></div><p id="breath-t">หายใจตามวงกลม<small>4 · 7 · 8</small></p></div>
+  <div class="mon" id="mon" role="group" aria-label="วัดเสียงในห้อง">
+    <div class="mon-h"><b><svg class="i" aria-hidden="true"><use href="#i-mic"/></svg><span id="mon-h">กำลังฟังเสียงในห้อง</span></b><small id="mon-src"></small></div>
+    <div class="mon-bars" id="mon-bars" aria-hidden="true"></div>
+    <div class="mon-f"><span id="mon-db">— dB</span><span id="mon-sn">ยังไม่พบเสียงกรน</span></div>
+    <div class="mon-b"><p class="mon-note" id="mon-note"></p><button class="mon-t" type="button" id="mon-t">หยุดฟังเสียง</button></div>
+  </div>
+  <div class="acts">
+    <button class="btn" type="button" id="wake"><svg class="i" aria-hidden="true"><use href="#i-sunrise"/></svg>ตื่นแล้ว ดูผลการนอน</button>
+    <button class="btn ghost" type="button" id="sleep-back">กลับไปปรับห้อง</button>
+  </div>
+</div>
+
+<div class="dawn" id="dawn" aria-hidden="true">
+  <div><p class="hand">Better night, Better life</p><h2>อรุณสวัสดิ์</h2><p>กำลังสรุปผลการนอนของคุณ</p></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const ico = (id) => `<svg class="i" aria-hidden="true"><use href="#${id}"/></svg>`;
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+};
+
+/* ---------- ข้อมูลจากแบบประเมิน Find Your Night (ตรงกับ kuendee-mbti/src/sleep.js) ---------- */
+const PERSONAS = {
+  A: { en: "The Overthinker", th: "หัวยังไม่หยุด", tone: "Calm Navy" },
+  B: { en: "The Restless Body", th: "ร่างกายยังไม่ได้พัก", tone: "Soft Sage" },
+  C: { en: "The Off-Clock Worker", th: "นาฬิกาชีวิตคลาด", tone: "Deep Night" },
+  D: { en: "The Early Waker", th: "ตื่นเร็วเกินไป", tone: "Warm Earth" },
+  N: { en: "The Steady Sleeper", th: "ค่ำคืนค่อนข้างสมดุล", tone: "KUENDEE Signature" },
+};
+const SOUNDS = {
+  quiet: { th: "เงียบ", d: "ไม่เกิน 30 dB(A)" },
+  rain: { th: "ฝนพรำ", d: "เสียงฝนเบา ๆ" },
+  ocean: { th: "คลื่นทะเล", d: "จังหวะช้า ช่วยหายใจ" },
+  pink: { th: "Pink noise", d: "นุ่ม กลบเสียงเบา" },
+  brown: { th: "Brown noise", d: "ทุ้มต่ำ กลบเสียงรถ" },
+  music: { th: "เพลงบรรเลง", d: "60–70 BPM" },
+  bath: { th: "Sound bath", d: "ขันทิเบต ช่วงผ่อนคลาย" },
+  birds: { th: "นกยามเช้า", d: "ปลุกแบบนุ่มนวล" },
+};
+const SCENTS = {
+  lavender: { th: "ลาเวนเดอร์", d: "ผ่อนคลาย" },
+  bergamot: { th: "เบอร์กามอท", d: "คลายความกังวล" },
+  hinoki: { th: "ไม้ฮิโนกิ", d: "สงบ หนักแน่น" },
+  jasmine: { th: "มะลิ", d: "นุ่มนวลแบบไทย" },
+  lemongrass: { th: "ตะไคร้", d: "สดชื่นยามเช้า" },
+  off: { th: "ไม่ใช้กลิ่น", d: "ปิดเครื่องหอม" },
+};
+const FIRM = { soft: "นุ่ม", mid: "พอดี", firm: "แน่น" };
+const WAKES = {
+  L: { th: "แสงอรุณ", d: "สว่างขึ้นช้า ๆ 30 นาที" },
+  S: { th: "เสียงธรรมชาติ", d: "นกยามเช้า ค่อย ๆ ดังขึ้น" },
+  LS: { th: "แสงและเสียง", d: "สำหรับคนที่ตื่นยาก" },
+};
+const DEFAULT_PRESET = "KD-AB-T24-L0-BN45-WL";
+
+/* รหัส: KD-{persona}{รอง}-T{°C}-L{0 มืดสนิท|1 สลัว}-{Q30|PN40|BN45|NT35|MU35}-W{L แสง|S เสียง|LS ทั้งคู่} */
+function parsePreset(raw) {
+  const code = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
+  const m = /^KD-([ABCDN])([ABCD]?)-T(2[3-7])-L([01])-(Q30|PN4[05]|BN4[05]|NT(?:35|40)|MU35)-W(LS|L|S)$/.exec(code);
+  if (!m) return null;
+  const s = m[5], kind = s.replace(/\d+/, "");
+  return { code, p: m[1], s: m[2], t: +m[3], dim: m[4] === "1",
+    sound: { type: { Q: "quiet", PN: "pink", BN: "brown", NT: "rain", MU: "music" }[kind], db: +s.match(/\d+/)[0] }, wake: m[6] };
+}
+
+/* ---------- อุณหภูมิตามงานวิจัยการนอน (ที่มาอยู่ใน README) ----------
+   หลับลึกดีที่สุดเมื่อห้องเย็นสบายพอดีกับผ้าห่ม: คนไทย ห่มผ้าบางถึงกลาง ≈ 24–26°C ความชื้น 50–60%
+   ร้อนหรือเย็นเกินไป หลับช้า หลับลึกสั้น ตื่นบ่อย · ในผ้าห่มอุ่นราว 32–34°C
+   ทั้งคืน: เข้านอน T → หลังหลับ 3 ชม. T+1 (ช่วงท้ายคืนร่างกายคุมอุณหภูมิได้น้อย) → ก่อนตื่น T+2 ไม่เกิน 28 */
+const T_MIN = 22, T_MAX = 28, B_MIN = 30, B_MAX = 35, HUMID = 55;
+function tBand(t) {
+  if (t >= 24 && t <= 26) return { c: "ok", th: "หลับลึกดีที่สุด", long: "อยู่ในช่วงที่หลับลึกได้ดีที่สุด" };
+  if (t === 23) return { c: "mid", th: "เย็นไปนิด", long: "เย็นไปนิด ห่มผ้าหนาขึ้นได้" };
+  if (t === 27) return { c: "mid", th: "อุ่นไปนิด", long: "อุ่นไปนิด ใช้ผ้าห่มบาง" };
+  return t < 23 ? { c: "warn", th: "เย็นเกินไป", long: "เย็นเกินไป หลับลึกจะสั้นลงและตื่นง่าย" } : { c: "warn", th: "ร้อนเกินไป", long: "ร้อนเกินไป หลับลึกจะสั้นลงและตื่นบ่อย" };
+}
+function bBand(b) {
+  if (b >= 32 && b <= 34) return { c: "ok", th: "อุ่นสบาย", long: "อุ่นสบาย ช่วยให้หลับเร็วขึ้น" };
+  return b < 32 ? { c: "mid", th: "เย็นไปนิด", long: "เย็นไปนิด ผิวที่เย็นทำให้ตื่นง่าย" } : { c: "mid", th: "อุ่นไปนิด", long: "อุ่นไปนิด อาจเหงื่อออกจนตื่น" };
+}
+
+/* ---------- 5 ช่วงของคืน (ตามหน้า Sleep Lab ของทีม) ---------- */
+const PHASES = [
+  { id: "wind", t: "21:00", th: "ผ่อนคลาย", en: "Wind-down", icon: "i-lotus" },
+  { id: "pre", t: "22:00", th: "เตรียมนอน", en: "Pre-sleep", icon: "i-leaf" },
+  { id: "deep", t: "23:00", th: "หลับลึก", en: "Deep sleep", icon: "i-bed" },
+  { id: "sunrise", t: "06:30", th: "แสงอรุณ", en: "Sunrise", icon: "i-sunrise" },
+  { id: "wake", t: "07:00", th: "ตื่นนอน", en: "Wake & report", icon: "i-bars" },
+];
+const hhmm = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+const phaseTime = (id) => (id === "sunrise" ? hhmm(S.wakeAt - 30) : id === "wake" ? hhmm(S.wakeAt) : PHASES.find((p) => p.id === id).t);
+/* shut = ผ้าม่านทึบแสงปิด: หัวค่ำเปิดรับวิว · หลับลึกปิดทึบ · แสงอรุณเปิดเองถ้าปลุกด้วยแสง · ตื่นแล้วเปิด */
+function phaseBase(id) {
+  const P = S.P, W = S.wake;
+  const wakeSound = { type: "birds", db: W === "L" ? 35 : 45 };
+  return {
+    wind: { light: { lux: 150, k: 2700, shut: false }, sound: { type: "bath", db: 35 }, scent: { type: "lavender", lvl: 60 }, co2: 620, incline: 10 },
+    pre: { light: { lux: 30, k: 2200, shut: false }, sound: { type: P.sound.type, db: Math.max(30, P.sound.db - 5) }, scent: { type: "lavender", lvl: 40 }, co2: 640, incline: 5 },
+    deep: { light: { lux: P.dim ? 1 : 0, k: 1800, shut: true }, sound: { ...P.sound }, scent: { type: "lavender", lvl: 20 }, co2: 690, incline: 0 },
+    sunrise: { light: W === "S" ? { lux: 0, k: 1800, shut: true } : { lux: 250, k: 4200, shut: false }, sound: W === "L" ? { type: "quiet", db: 30 } : wakeSound, scent: { type: "lemongrass", lvl: 30 }, co2: 580, incline: 0 },
+    wake: { light: { lux: 300, k: 5000, shut: false }, sound: wakeSound, scent: { type: "lemongrass", lvl: 40 }, co2: 540, incline: 15 },
+  }[id];
+}
+
+/* ---------- สถานะของห้อง ---------- */
+const P0 = parsePreset(new URLSearchParams(location.search).get("preset")) || parsePreset(store.get("kd-lab-preset")) || parsePreset(DEFAULT_PRESET);
+const S = {
+  P: P0, T: P0.t, B: 33, wake: P0.wake, wakeAt: 7 * 60,
+  over: {}, /* ค่าที่ปรับเองในแต่ละช่วง เช่น { wind: { light: { lux: 100 } } } */
+  phase: "wind",
+  light: { lux: 150, k: 2700, shut: false, path: true },
+  sound: { type: "bath", db: 35, timer: "all" },
+  scent: { type: "lavender", lvl: 60, auto: true },
+  temp: { smart: true },
+  bed: { firm: "mid", incline: 10 },
+  co2: 620, ab: "A",
+};
+const roomAt = (id) => (S.temp.smart && (id === "sunrise" || id === "wake") ? Math.min(S.T + 2, T_MAX) : S.T);
+const lateT = () => (S.temp.smart ? Math.min(S.T + 1, T_MAX) : S.T);
+const wakeT = () => (S.temp.smart ? Math.min(S.T + 2, T_MAX) : S.T);
+function resolved(id) {
+  const b = phaseBase(id), o = S.over[id] || {};
+  return {
+    light: { ...b.light, ...(o.light || {}) }, sound: { ...b.sound, ...(o.sound || {}) }, scent: { ...b.scent, ...(o.scent || {}) },
+    incline: o.incline != null ? o.incline : b.incline, co2: b.co2,
+  };
+}
+function setOver(key, val) {
+  const o = (S.over[S.phase] = S.over[S.phase] || {});
+  o[key] = val && typeof val === "object" ? { ...(o[key] || {}), ...val } : val;
+}
+function applyPhase(id) {
+  const v = resolved(id);
+  S.phase = id;
+  Object.assign(S.light, v.light); Object.assign(S.sound, v.sound); Object.assign(S.scent, v.scent);
+  S.bed.incline = v.incline; S.co2 = v.co2;
+  renderRoom();
+}
+
+/* ---------- ตัวช่วยแสดงผล ---------- */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function kRGB(k) { /* อุณหภูมิสี → RGB (สูตร Tanner Helland) */
+  const t = k / 100; let r, g, b;
+  if (t <= 66) { r = 255; g = 99.47 * Math.log(t) - 161.12; b = t <= 19 ? 0 : 138.52 * Math.log(t - 10) - 305.04; }
+  else { r = 329.7 * Math.pow(t - 60, -0.1332); g = 288.12 * Math.pow(t - 60, -0.0755); b = 255; }
+  return [r, g, b].map((x) => Math.round(clamp(x, 0, 255)));
+}
+const kHex = (k) => "#" + kRGB(k).map((x) => x.toString(16).padStart(2, "0")).join("");
+const kName = (k) => (k <= 2000 ? "แสงเทียน" : k <= 2400 ? "ส้มอุ่น" : k <= 3000 ? "อำพันอุ่น" : k <= 4500 ? "ขาวนวล" : "แสงเช้า");
+const lvlName = (v) => (v <= 0 ? "ปิด" : v < 34 ? "เบา" : v < 67 ? "กลาง" : "เข้ม");
+const KTRACK = `linear-gradient(90deg,${[1800, 2400, 3000, 3800, 5000].map((k) => kHex(k)).join(",")})`;
+const curText = (l) => (l.shut ? " · ม่านปิด" : "");
+const lightText = (l) => (l.lux === 0 ? "มืดสนิท" : `${kName(l.k)} ${l.k} K · ${l.lux} lux`) + curText(l);
+const soundText = (s) => (s.type === "quiet" ? "เงียบ · ไม่เกิน 30 dB(A)" : `${SOUNDS[s.type].th} ${s.db} dB(A)`);
+const scentText = (c, auto) => (c.type === "off" || c.lvl === 0 ? "ไม่ใช้กลิ่น" : `${SCENTS[c.type].th} · ${lvlName(c.lvl)}${auto ? " · ปิดเองหลังหลับ" : ""}`);
+const wakeBy = () => WAKES[S.wake].th;
+const wakeText = () => (S.wake === "S" ? "เสียงนกยามเช้า" : `${S.wake === "LS" ? "แสง+เสียง" : "แสงอรุณ"} ${hhmm(S.wakeAt - 30)}`);
+const setFill = (input) => {
+  const p = ((input.value - input.min) / (input.max - input.min)) * 100;
+  input.style.setProperty("--p", p + "%");
+};
+
+/* ---------- วาดหน้า "คืนนี้" ---------- */
+const LEADS = {
+  wind: () => `แสงอุ่น เสียงนุ่ม ห้องเย็นรอไว้ที่ ${S.T}°C`,
+  pre: () => "หรี่แสงลง วางมือถือไว้นอกเตียงได้เลย",
+  deep: () => (S.temp.smart && lateT() !== S.T ? `ไฟดับ หลับ 3 ชม. แล้วห้องอุ่นขึ้นเป็น ${lateT()}°C` : "ไฟดับ เสียงกลบเปิดทั้งคืน"),
+  sunrise: () => (S.wake === "S" ? "เสียงนกค่อย ๆ ดังขึ้นตอนหลับตื้น" : "แสงค่อย ๆ สว่างขึ้นตอนหลับตื้น"),
+  wake: () => "ผลการนอนของคุณพร้อมแล้ว",
+};
+function renderGreeting() {
+  const P = S.P, per = PERSONAS[P.p];
+  $("#g-eyebrow").textContent = `${per.en} · ${per.th}`;
+  $("#g-title").textContent = { sunrise: "ห้องกำลังพาคุณตื่น", wake: "อรุณสวัสดิ์" }[S.phase] || "ห้องนี้ออกแบบมาเพื่อคุณ";
+  $$("[data-begin]").forEach((b) => (b.firstChild.textContent = S.phase === "wake" ? "ดูผลการนอน " : "เริ่มค่ำคืน "));
+  $("#g-lead").textContent = LEADS[S.phase]();
+  $("#preset-code").textContent = P.code;
+  $("#rail-code").textContent = P.code;
+  $("#rail-tone").textContent = per.tone + " Room";
+  $("#cta-note").textContent = `ปลุกด้วย${wakeBy()} ${hhmm(S.wakeAt)} · ห้องปรับเองตลอดคืน`;
+}
+function renderAir() { $("#air").textContent = `ความชื้น ${HUMID}% · CO₂ ${S.co2} ppm`; }
+function renderPhases() {
+  $("#phases").innerHTML = PHASES.map((p) => `<button class="ph" type="button" data-phase="${p.id}" aria-pressed="${p.id === S.phase}">
+    <span class="dotc">${ico(p.icon)}</span><time>${phaseTime(p.id)}</time><span>${p.th}</span></button>`).join("");
+  const ph = PHASES.find((p) => p.id === S.phase);
+  $("#ctl-phase").textContent = `${ph.th} · ${phaseTime(ph.id)}`;
+}
+
+/* ---------- ตัวปรับห้อง 6 อย่าง: แถวละ 1 ค่าตัวใหญ่ + ปุ่ม −/+ · แตะชื่อเพื่อดูละเอียด ---------- */
+const CTLS = [
+  { id: "temp", icon: "i-temp", th: "อุณหภูมิห้อง" },
+  { id: "light", icon: "i-sun", th: "แสง" },
+  { id: "sound", icon: "i-sound", th: "เสียง" },
+  { id: "scent", icon: "i-leaf", th: "กลิ่น" },
+  { id: "bed", icon: "i-bed", th: "ในผ้าห่ม" },
+  { id: "wake", icon: "i-sunrise", th: "ปลุก" },
+];
+const LUX = [0, 1, 3, 10, 30, 60, 100, 150, 200, 250, 300];
+const LVL = [0, 25, 50, 75, 100];
+const nextIn = (arr, v, d) => (d > 0 ? arr.find((x) => x > v) ?? arr[arr.length - 1] : [...arr].reverse().find((x) => x < v) ?? arr[0]);
+function rowView(id) {
+  if (id === "temp") {
+    const b = tBand(S.T), late = S.temp.smart && (S.phase === "sunrise" || S.phase === "wake");
+    return { v: roomAt(S.phase), u: "°C", sub: late ? `ตอนหลับ ${S.T}°C` : b.th, dot: b.c, min: S.T <= T_MIN, max: S.T >= T_MAX };
+  }
+  if (id === "light") {
+    const l = S.light; /* ม่านปิด: ตัดตัวเลข K ออก (จุดสีบอกสีแสงอยู่แล้ว) ให้พอดีบรรทัดเดียวที่ 375 และ 1024 px */
+    return l.lux === 0 ? { v: "ปิด", u: "0 lux", sub: "มืดสนิท" + curText(l), min: true }
+      : { v: l.lux, u: "lux", sub: l.shut ? kName(l.k) + curText(l) : `${kName(l.k)} ${l.k}K`, hex: kHex(l.k), max: l.lux >= LUX[LUX.length - 1] };
+  }
+  if (id === "sound") {
+    const s = S.sound;
+    return s.type === "quiet" ? { v: "เงียบ", u: "≤30 dB(A)", sub: "ไม่เปิดเสียง", min: true }
+      : { v: s.db, u: "dB(A)", sub: SOUNDS[s.type].th, min: s.db <= 25, max: s.db >= 55 };
+  }
+  if (id === "scent") {
+    const c = S.scent;
+    return c.type === "off" || c.lvl === 0 ? { v: "ปิด", u: "กลิ่น", sub: "ไม่ใช้กลิ่น", min: true }
+      : { v: lvlName(c.lvl), u: "ความเข้ม", sub: SCENTS[c.type].th, max: c.lvl >= 100 };
+  }
+  if (id === "bed") {
+    const b = bBand(S.B);
+    return { v: S.B, u: "°C", sub: b.th, dot: b.c, min: S.B <= B_MIN, max: S.B >= B_MAX };
+  }
+  return { v: hhmm(S.wakeAt), u: "ตื่น", sub: wakeText(), min: S.wakeAt <= 300, max: S.wakeAt >= 570 };
+}
+let ctlBuilt = false;
+function renderControls() {
+  $("#ctl-rows").innerHTML = CTLS.map((c) => `<div class="ctl" data-ctl="${c.id}">
+    <button class="lab" type="button" data-open="${c.id}" aria-label="ตั้งค่า${c.th}เพิ่มเติม">
+      <span class="ic">${ico(c.icon)}</span>
+      <span class="txt"><span>${c.th}${ico("i-chev")}</span><small id="t-${c.id}"></small></span>
+    </button>
+    <div class="qs" data-step="${c.id}">
+      <button type="button" data-d="-1" aria-label="ลด${c.th}">−</button>
+      <output id="rv-${c.id}" aria-live="polite"></output>
+      <button type="button" data-d="1" aria-label="เพิ่ม${c.th}">+</button>
+    </div></div>`).join("");
+  ctlBuilt = true;
+}
+function updateControls() {
+  CTLS.forEach((c) => {
+    const r = rowView(c.id), btns = $$(`.ctl[data-ctl="${c.id}"] .qs button`);
+    $("#rv-" + c.id).innerHTML = `${esc(r.v)}<small>${esc(r.u)}</small>`;
+    const dot = r.hex ? `<i class="dot" style="background:${r.hex}"></i>` : r.dot ? `<i class="dot ${r.dot}"></i>` : "";
+    $("#t-" + c.id).innerHTML = dot + esc(r.sub);
+    btns[0].disabled = !!r.min; btns[1].disabled = !!r.max;
+  });
+}
+function renderRoom() {
+  if (!ctlBuilt) renderControls();
+  live();
+}
+
+/* ---------- ภาพห้องตอบสนองตามค่าแสง/กลิ่น/ช่วงเวลา ----------
+   รูปจริงของห้อง Sleep Lab (ถ่ายตอนไฟอุ่น ~2700K ราว 150 lux) + ชั้นโปร่งใสซ้อน (CSS ใน style-2.css) ไม่แก้ไฟล์รูป */
+const SKY = { sunrise: ["#53638e", "#e9b68b"], wake: ["#8eaccb", "#f1d9bd"] };
+const toHex = (rgb) => "#" + rgb.map((x) => Math.round(clamp(x, 0, 255)).toString(16).padStart(2, "0")).join("");
+const kRel = (k) => { const a = kRGB(k), b = kRGB(2700); return a.map((x, i) => (x + 24) / (b[i] + 24)); }; /* สีแสง k เทียบกับแสงในรูป */
+function warmMul(k) { /* อุ่นกว่าในรูป → สีสำหรับชั้นคูณ (แดงเต็ม เขียว/น้ำเงินลดตามจริง) */
+  const q = kRel(Math.min(k, 2700)), mx = Math.max(...q);
+  return toHex(q.map((x) => (255 * x) / mx));
+}
+function coolSoft(k) { /* เย็นกว่าในรูป → สีสำหรับชั้น soft-light: เทากลาง = เท่าเดิม · อมฟ้า = ขาวเย็นขึ้น */
+  const r = kRel(Math.max(k, 2700)).map(Math.log), m = (r[0] + r[1] + r[2]) / 3;
+  return toHex(r.map((x) => 128 + (x - m) * 65));
+}
+/* ผ้าม่าน: มุมของผืนผ้าในรูปเต็ม (สัดส่วนของ 1140×912) บน-ซ้าย บน-ขวา ล่าง-ขวา ล่าง-ซ้าย
+   ซ้าย = ขอบกองม่านเดิม x 639 · บน = ขอบบนแถบไฟซ่อน (รางม่าน) · ล่าง = แนวพื้น — วัดจากพิกเซลรูป (ดู drape_mask.py) */
+const DRAPE = [[639, 180.6], [1140, 64.5], [1140, 624.1], [639, 572.2]].map(([x, y]) => [x / 1140, y / 912]);
+function drapeFit() { /* map กล่อง .dr (ขนาดเท่า .cv) ลงสี่เหลี่ยมผนังหน้าต่างแบบมีมุมมอง (homography → matrix3d) */
+  const cv = $(".scene .cv"), dr = $(".l-drape .dr");
+  const w = cv ? cv.clientWidth : 0, h = cv ? cv.clientHeight : 0;
+  if (!w || !h || !dr) return;
+  const [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = DRAPE.map(([x, y]) => [x * w, y * h]);
+  const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+  const den = dx1 * dy2 - dx2 * dy1, g = (dx3 * dy2 - dx2 * dy3) / den, k = (dx1 * dy3 - dx3 * dy1) / den;
+  const a = x1 - x0 + g * x1, b = x3 - x0 + k * x3, d = y1 - y0 + g * y1, e = y3 - y0 + k * y3;
+  dr.style.transform = `matrix3d(${[a / w, d / w, 0, g / w, b / h, e / h, 0, k / h, 0, 0, 1, 0, x0, y0, 0, 1].join(",")})`;
+}
+/* ลอนจีบทั้งผืนเป็น linear-gradient เดียว (ไม่ใช้ลายซ้ำ) สุ่มแบบคงที่: แต่ละลอนกว้าง ±22% ลึกและสว่างต่างกัน
+   ด้านซ้ายของลอนรับแสงโคม (สันสว่างแคบ) ด้านขวาเป็นเงากว้าง · --fb = ช่วงล่างที่ลอนเหลื่อมเล็กน้อยเหมือนผ้าที่ทิ้งตัว */
+function drapeFolds() {
+  const fab = $(".l-drape .fab"); if (!fab) return;
+  let s = 20261109; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const N = 18, ws = Array.from({ length: N }, () => 1 + (rnd() - 0.5) * 0.44), tot = ws.reduce((a, b) => a + b, 0);
+  const A = [0]; ws.forEach((w, i) => A.push(A[i] + w / tot)); A[N] = 1;
+  const B = A.map((x, i) => (i && i < N ? x + (A[i + 1] - A[i - 1]) * (rnd() - 0.5) * 0.2 : x));
+  const BASE = [101, 74, 52], MID = 0.84;
+  const PROF = [[0, 0.46], [0.07, 0.6], [0.16, 1.14], [0.25, 1.05], [0.43, 0.9], [0.6, 0.82], [0.71, 0.88], [0.86, 0.66], [0.95, 0.5]];
+  const grad = (bd) => {
+    const st = [];
+    for (let i = 0; i < N; i++) {
+      const w = bd[i + 1] - bd[i], dep = 0.72 + rnd() * 0.5, br = (rnd() - 0.5) * 0.12;
+      PROF.forEach(([t, f]) => {
+        const k = MID + (f - MID) * dep + br;
+        st.push(`rgb(${BASE.map((c) => Math.round(c * k)).join(",")}) ${((bd[i] + t * w) * 100).toFixed(2)}%`);
+      });
+    }
+    const k0 = MID + (0.46 - MID) * 0.9;
+    st.push(`rgb(${BASE.map((c) => Math.round(c * k0)).join(",")}) 100%`);
+    return `linear-gradient(90deg,${st.join(",")})`;
+  };
+  fab.style.setProperty("--fa", grad(A));
+  fab.style.setProperty("--fb", grad(B));
+}
+let shutDrawn = null, swingT = 0;
+function drawScene() {
+  const lux = S.light.lux, ph = S.phase, morn = ph === "sunrise" || ph === "wake", shut = !!S.light.shut;
+  const lit = clamp(Math.log10(lux + 1) / Math.log10(151), 0, 1); /* 0 = ไฟดับ · 1 = 150 lux เท่าแสงในรูป */
+  let dark = 0.92 * Math.pow(1 - lit, 0.6);
+  if (morn && !shut) dark = Math.min(dark, ph === "wake" ? 0.15 : 0.45); /* เช้าแล้ว แสงจากหน้าต่างช่วยให้ห้องไม่มืด (ม่านปิด = เหลือแค่แสงโคม) */
+  const sky = SKY[morn ? ph : "sunrise"];
+  const v = {
+    "--kc": kHex(S.light.k), "--wm": warmMul(S.light.k), "--wb": coolSoft(S.light.k), "--sk1": sky[0], "--sk2": sky[1],
+    "--warm": lux === 0 || S.light.k >= 2700 ? 0 : (0.45 + 0.55 * lit) * 0.65,
+    "--tint": lux === 0 || S.light.k <= 2700 ? 0 : 0.45 + 0.55 * lit,
+    "--lift": clamp((lux - 150) / 150, 0, 1) * 0.6,
+    "--dark": dark, /* กระจกมืดลงน้อยกว่าห้อง (mask ใน CSS) วิวกลางคืนยังเห็น */
+    "--shut": shut ? dark : 0, /* ม่านปิด: ฝั่งหน้าต่างไม่มีแสงจันทร์ มืดเท่าห้อง */
+    "--moon": morn || shut ? 0 : dark * dark * 0.75,
+    "--glow": lux === 0 ? 0 : 0.85 * dark * Math.pow(lit, 0.4), /* โคมเรืองชัดสุดตอนห้องสลัว */
+    "--sky": ph === "sunrise" ? 0.85 : ph === "wake" ? 0.9 : 0, /* ม่านปิดแล้วผืนผ้าบังฟ้าและภูเขาเอง */
+    "--land": ph === "sunrise" ? 0.35 : ph === "wake" ? 0.5 : 0,
+    "--sun": shut ? 0 : ph === "sunrise" ? 0.55 : ph === "wake" ? 0.75 : 0,
+    /* ไอกลิ่นตามระดับ · ห้องมืดเห็นไอจางลง (ไม่มีแสงส่อง) */
+    "--mist": S.scent.type === "off" || S.scent.lvl === 0 ? 0 : (0.3 + (S.scent.lvl / 100) * 0.7) * (1 - 0.7 * dark),
+  };
+  const el = $(".scene .photo");
+  for (const p in v) el.style.setProperty(p, typeof v[p] === "number" ? v[p].toFixed(3) : v[p]);
+  if (shutDrawn !== null && shutDrawn !== shut) { /* ม่านเพิ่งเปลี่ยน: ให้แสงในห้องค่อย ๆ เปลี่ยนตามผ้า */
+    el.classList.add("swing"); clearTimeout(swingT); swingT = setTimeout(() => el.classList.remove("swing"), 2200);
+  }
+  shutDrawn = shut; el.classList.toggle("shut", shut);
+}
+
+/* ---------- แผ่นรายละเอียด ---------- */
+const FMT = {};
+const head = (icon, title) => `<div class="sheet-h"><span class="ic">${ico(icon)}</span><h3 id="sheet-title">${title}</h3><button class="x" type="button" data-close aria-label="ปิด">${ico("i-close")}</button></div>`;
+function rangeF(id, label, val, min, max, step, fmt, cls = "") {
+  FMT[id] = fmt;
+  return `<div class="field"><div class="field-h"><label for="${id}">${label}</label><b id="${id}-v">${fmt(val)}</b></div><input class="range ${cls}" id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${val}"></div>`;
+}
+const optsF = (name, label, map, cur) => `<div class="field"><div class="field-h"><span>${label}</span></div><div class="opts" role="group" aria-label="${label}">${Object.entries(map).map(([k, v]) => `<button class="opt" type="button" data-${name}="${k}" aria-pressed="${k === cur}">${v.th}<small>${v.d}</small></button>`).join("")}</div></div>`;
+const swF = (id, title, sub, on) => `<div class="field row-sw"><div><span>${title}</span><small>${sub}</small></div><button class="sw" type="button" id="${id}" role="switch" aria-checked="${on}" aria-label="${title}"></button></div>`;
+const segF = (name, label, items, cur, hint = "") => `<div class="field"><div class="field-h"><span>${label}</span></div><div class="seg" role="group" aria-label="${label}">${items.map(([k, l]) => `<button type="button" data-${name}="${k}" aria-pressed="${k === cur}">${l}</button>`).join("")}</div>${hint ? `<p class="hint">${hint}</p>` : ""}</div>`;
+const bigStep = (k, text, label) => `<div class="field center"><div class="stepper big" data-step="${k}"><button type="button" data-d="-1" aria-label="ลด${label}">−</button><output class="o-${k}">${text}</output><button type="button" data-d="1" aria-label="เพิ่ม${label}">+</button></div><p class="hint">${label}</p>`;
+const why = (title, text) => `<div class="field why"><b>${title}</b><p>${text}</p></div>`;
+const KPRE = { 1800: { th: "แสงเทียน", d: "1800 K · ไฟกลางคืน" }, 2700: { th: "อำพันอุ่น", d: "2700 K · ผ่อนคลาย" }, 4000: { th: "ขาวนวล", d: "4000 K · อ่านหนังสือ" }, 5000: { th: "แสงเช้า", d: "5000 K · ตอนตื่น" } };
+const EXAMPLES = ["KD-AB-T24-L0-BN45-WL", "KD-C-T25-L1-PN40-WLS", "KD-D-T26-L0-NT35-WS"];
+const NIGHTS = [["sat", "เสาร์ 14 พ.ย.", "ว่าง 2 ห้อง"], ["sun", "อาทิตย์ 15 พ.ย.", "ว่าง 1 ห้อง"], ["fri", "ศุกร์ 20 พ.ย.", "ว่าง 3 ห้อง"], ["sat2", "เสาร์ 21 พ.ย.", "ว่าง 2 ห้อง"]];
+const SHEETS = {
+  temp: () => head("i-temp", "อุณหภูมิห้อง") + bigStep("temp", S.T + "°", "อุณหภูมิตอนหลับ") +
+    `<div class="tscale" aria-hidden="true"><div class="tbar"><span class="band"></span><i id="t-mark"></i></div>
+      <div class="tlab"><span>22°</span><span>หลับลึกดีที่สุด 24–26°</span><span>28°</span></div></div><p class="band-t" id="t-band"></p></div>` +
+    `<div class="field"><div class="field-h"><span>ตลอดคืน</span><b>ความชื้น ${HUMID}%</b></div><div class="sched" id="sched"></div></div>` +
+    swF("s-smart", "ปรับเองตามช่วงการนอน", "ช่วงท้ายคืนร่างกายคุมอุณหภูมิได้น้อย ห้องจึงอุ่นขึ้น 1°C ไม่ให้หนาวจนตื่น และอุ่นขึ้นอีกก่อนตื่น", S.temp.smart) +
+    why("ทำไมต้อง 24–26°C", "ร่างกายต้องลดอุณหภูมิแกนกลางลงเล็กน้อยจึงหลับลึกได้ ห้องเย็นสบายช่วยให้ลดได้ง่าย ห้องที่ร้อนหรือเย็นเกินไปทำให้หลับช้า หลับลึกสั้นลง และตื่นบ่อยขึ้น ความชื้นที่ดีอยู่ราว 50–60% ค่านี้สำหรับผ้าห่มบางถึงกลาง ถ้าห่มผ้านวมหนาลดลงได้อีก 1–2°C"),
+  bed: () => head("i-bed", "ที่นอนและผ้าห่ม") + bigStep("bed", S.B + "°", "อุณหภูมิในผ้าห่ม") + `<p class="band-t" id="b-band"></p></div>` +
+    segF("firm", "ความแน่นของที่นอน", Object.entries(FIRM), S.bed.firm) +
+    rangeF("s-inc", "ยกหัวเตียง", S.bed.incline, 0, 15, 1, (v) => v + "°") +
+    why("ทำไมในผ้าห่มต้องอุ่น", "อากาศในห้องที่เย็นสบายคู่กับผิวที่อุ่นในผ้าห่มราว 32–34°C ช่วยให้มือและเท้าระบายความร้อน ร่างกายจึงหลับเร็วและหลับลึกขึ้น ที่นอนที่เย็นจนผิวเย็นทำให้ตื่นง่าย"),
+  light: () => head("i-sun", "แสง") +
+    rangeF("s-lux", "ความสว่าง", S.light.lux, 0, 300, 5, (v) => (+v === 0 ? "ปิด" : v + " lux")) +
+    rangeF("s-k", "สีของแสง", S.light.k, 1800, 5000, 100, (v) => `${kName(+v)} · ${v} K`, "k") +
+    optsF("kp", "โทนแสงสำเร็จรูป", KPRE, String(S.light.k)) +
+    segF("cur", "ผ้าม่าน", [["open", "เปิด"], ["shut", "ปิดทึบแสง"]], S.light.shut ? "shut" : "open",
+      `ค่าเริ่มปิดตอนหลับลึก แล้วเปิดเองตอน${S.wake === "S" ? "ตื่น " + hhmm(S.wakeAt) : "แสงอรุณ " + hhmm(S.wakeAt - 30)}`) +
+    swF("s-path", "ไฟทางเดินกลางดึก", "1800 K ไม่เกิน 3 lux เปิดเองเมื่อลุกจากเตียง", S.light.path),
+  sound: () => head("i-sound", "เสียง") + optsF("snd", "เสียงในห้อง", SOUNDS, S.sound.type) +
+    rangeF("s-db", "ความดัง", S.sound.db, 25, 55, 1, (v) => v + " dB(A)") +
+    segF("timer", "ตั้งเวลาปิด", [["30", "30 นาที"], ["60", "1 ชั่วโมง"], ["all", "ทั้งคืน"]], S.sound.timer, "ถ้าเสียงข้างนอกดังเกิน 50 dB(A) ห้องจะเพิ่มเสียงกลบให้ชั่วคราว"),
+  scent: () => head("i-leaf", "กลิ่น") + optsF("sct", "กลิ่นในห้อง", SCENTS, S.scent.type) +
+    rangeF("s-lvl", "ความเข้มของกลิ่น", S.scent.lvl, 0, 100, 1, (v) => lvlName(+v)) +
+    swF("s-auto", "ปิดเองหลังหลับ 30 นาที", "ไม่ให้กลิ่นค้างทั้งคืน จมูกได้พักด้วย", S.scent.auto),
+  wake: () => head("i-sunrise", "การปลุก") + bigStep("wake", hhmm(S.wakeAt), "เวลาตื่น") + `<p class="hint">ห้องเริ่มปลุกก่อน 30 นาที</p></div>` +
+    optsF("wk", "วิธีปลุก", WAKES, S.wake) +
+    why("ปลุกแบบค่อยเป็นค่อยไป", "ร่างกายตื่นง่ายที่สุดตอนหลับตื้น แสงหรือเสียงที่ค่อย ๆ เพิ่มขึ้นช่วยให้ตื่นตอนนั้นพอดี จึงไม่งัวเงีย"),
+  preset: () => head("i-sliders", "Preset จากผลประเมิน") + `<div class="field">
+    <p class="muted" style="font-size:14px">ใส่รหัสจากหน้าผล Find Your Night แล้วห้องจะตั้งแสง เสียง อุณหภูมิ และวิธีปลุกให้ตรงกับคุณ</p>
+    <p style="font-size:14px;margin-top:8px">ตอนนี้: <b>${PERSONAS[S.P.p].en}</b>${S.P.s ? ` + ${PERSONAS[S.P.s].en}` : ""}</p>
+    <input class="inp" id="preset-in" value="${S.P.code}" autocomplete="off" spellcheck="false" aria-label="รหัส Preset" style="margin-top:12px">
+    <p class="err" id="preset-err" role="alert"></p>
+    <div class="tags">${EXAMPLES.map((c) => `<button class="tag" type="button" data-ex="${c}"><b>${c}</b></button>`).join("")}</div>
+    <button class="btn" type="button" id="preset-apply">ตั้งห้องตามรหัสนี้</button></div>`,
+  book: () => head("i-calendar", "จองคืนถัดไป") + `<div class="field" style="border-top:0">
+    <div class="field-h"><span>เลือกคืน</span><b>${PERSONAS[S.P.p].tone} Room</b></div>
+    <div class="opts">${NIGHTS.map(([k, d, s], i) => `<button class="opt" type="button" data-date="${k}" data-label="${d}" aria-pressed="${i === 0}">${d}<small>${s}</small></button>`).join("")}</div>
+    <p class="hint">ห้องจะตั้งค่าจากแผนล่าสุดของคุณ และ Night Designer จะดูผลคืนนี้ก่อนคุณมาถึง</p>
+    <button class="btn" type="button" id="book-ok">ยืนยันการจอง</button></div>`,
+  save: () => saveSheet(),
+};
+let lastFocus = null;
+function openSheet(kind) {
+  lastFocus = document.activeElement;
+  $("#sheet-body").innerHTML = SHEETS[kind]();
+  $$("#sheet-body .range").forEach(setFill);
+  syncSheet();
+  const w = $("#sheet"); w.classList.add("open"); w.setAttribute("aria-hidden", "false");
+  setTimeout(() => { const x = $("#sheet .x"); if (x) x.focus({ preventScroll: true }); }, 60);
+}
+function closeSheet() {
+  const w = $("#sheet"); if (!w.classList.contains("open")) return;
+  w.classList.remove("open"); w.setAttribute("aria-hidden", "true");
+  if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+}
+function syncSheet() {
+  [["s-lux", S.light.lux], ["s-db", S.sound.db], ["s-lvl", S.scent.lvl], ["s-inc", S.bed.incline]].forEach(([id, v]) => {
+    const el = $("#" + id); if (el && +el.value !== v) { el.value = v; setFill(el); }
+  });
+  Object.entries(FMT).forEach(([id, f]) => { const el = $("#" + id), v = $("#" + id + "-v"); if (el && v) v.textContent = f(el.value); });
+  const db = $("#s-db"); if (db) db.disabled = S.sound.type === "quiet";
+  $$(".o-temp").forEach((o) => (o.textContent = S.T + "°"));
+  $$(".o-bed").forEach((o) => (o.textContent = S.B + "°"));
+  $$(".o-wake").forEach((o) => (o.textContent = hhmm(S.wakeAt)));
+  const mk = $("#t-mark"); if (mk) mk.style.left = ((S.T - T_MIN) / (T_MAX - T_MIN)) * 100 + "%";
+  [["#t-band", tBand(S.T)], ["#b-band", bBand(S.B)]].forEach(([sel, b]) => { const el = $(sel); if (el) { el.className = "band-t " + b.c; el.textContent = b.long; } });
+  const sc = $("#sched");
+  if (sc) sc.innerHTML = [["เข้านอน", S.T], ["หลังหลับ 3 ชม.", lateT()], ["ก่อนตื่น 30 นาที", wakeT()]].map(([l, v]) => `<div>${l}<b>${v}°C</b></div>`).join("");
+}
+function live() { renderGreeting(); renderAir(); renderPhases(); updateControls(); drawScene(); syncSheet(); }
+function pressIn(btn) {
+  const grp = btn.closest(".opts, .seg"); if (!grp) return;
+  $$("button", grp).forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+}
+function step(k, d) {
+  if (k === "temp") S.T = clamp(S.T + d, T_MIN, T_MAX);
+  else if (k === "bed") S.B = clamp(S.B + d, B_MIN, B_MAX);
+  else if (k === "wake") S.wakeAt = clamp(S.wakeAt + d * 15, 300, 570);
+  else if (k === "light") { S.light.lux = nextIn(LUX, S.light.lux, d); setOver("light", { lux: S.light.lux }); }
+  else if (k === "sound") {
+    if (S.sound.type === "quiet") {
+      if (d < 0) return;
+      const type = S.P.sound.type !== "quiet" ? S.P.sound.type : "pink";
+      Object.assign(S.sound, { type, db: 30 });
+    } else S.sound.db = clamp(S.sound.db + d, 25, 55);
+    setOver("sound", { type: S.sound.type, db: S.sound.db });
+  } else if (k === "scent") {
+    if (S.scent.type === "off" || S.scent.lvl === 0) {
+      if (d < 0) return;
+      Object.assign(S.scent, { type: S.lastScent || (S.scent.type !== "off" ? S.scent.type : "lavender"), lvl: 25 });
+    } else S.scent.lvl = nextIn(LVL, S.scent.lvl, d);
+    setOver("scent", { type: S.scent.type, lvl: S.scent.lvl });
+  }
+  live();
+}
+const SW = { "s-path": () => [S.light, "path"], "s-auto": () => [S.scent, "auto"], "s-smart": () => [S.temp, "smart"], "s-attach": () => [SAVE, "attach"] };
+function toggleSw(t) {
+  const on = t.getAttribute("aria-checked") !== "true";
+  t.setAttribute("aria-checked", String(on));
+  const m = SW[t.id]; if (m) { const [obj, key] = m(); obj[key] = on; }
+  if (t.id === "s-smart") applyPhase(S.phase); else live();
+}
+
+/* ---------- หน้าและการนำทาง ---------- */
+const VIEWS = ["room", "report", "plan", "saved"];
+function go(tab, opts = {}) {
+  if (!VIEWS.includes(tab)) tab = "room";
+  $$(".view").forEach((v) => v.classList.toggle("on", v.id === "v-" + tab));
+  $$(".tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
+  document.body.classList.toggle("day", tab !== "room");
+  if (location.hash.slice(1) !== tab) { try { history.replaceState(null, "", "#" + tab); } catch (e) { /* บางหน้าต่างไม่อนุญาต */ } }
+  if (!opts.keepScroll) window.scrollTo(0, 0);
+  if (tab === "report") { renderHyp(); renderSnore(); animateScore(); }
+  if (tab === "plan") renderPlan();
+  if (tab === "saved") renderSaved();
+}
+
+/* ---------- โหมดหลับ → เช้า ---------- */
+let clockT = 0, breathT = {};
+const tick = () => { const d = new Date(); $("#clock").textContent = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+function beginNight() {
+  applyPhase("deep");
+  const sl = $("#sleep"); sl.classList.add("on"); sl.setAttribute("aria-hidden", "false");
+  $("#sleep-sub").textContent = `${S.light.lux === 0 ? "ไฟดับแล้ว" : "แสงสลัว " + S.light.lux + " lux"} · ${S.sound.type === "quiet" ? "ห้องเงียบ" : SOUNDS[S.sound.type].th + " " + S.sound.db + " dB(A)"} · ห้อง ${S.T}°C · ปลุกด้วย${wakeBy()} ${hhmm(S.wakeAt)}`;
+  tick(); clockT = setInterval(tick, 10000);
+  startBreath();
+  $("#batt").textContent = ""; startMonitor(); checkBattery();
+  setTimeout(() => $("#sleep-back").focus({ preventScroll: true }), 300);
+}
+function startBreath() {
+  const orb = $("#orb"), txt = $("#breath-t");
+  const steps = [["in", "หายใจเข้า", 4], ["hold", "กลั้นไว้", 7], ["out", "ผ่อนลมออกช้า ๆ", 8]];
+  let i = 0;
+  const run = () => {
+    const [cls, label, sec] = steps[i % 3];
+    let n = sec;
+    orb.className = "orb " + cls;
+    txt.innerHTML = `${label}<small>${n}</small>`;
+    clearInterval(breathT.c);
+    breathT.c = setInterval(() => { n -= 1; if (n > 0) txt.innerHTML = `${label}<small>${n}</small>`; }, 1000);
+    breathT.s = setTimeout(() => { i += 1; run(); }, sec * 1000);
+  };
+  run();
+}
+function stopBreath() {
+  clearInterval(breathT.c); clearTimeout(breathT.s);
+  $("#orb").className = "orb";
+  $("#breath-t").innerHTML = "หายใจตามวงกลม<small>4 · 7 · 8</small>";
+}
+function endSleep() {
+  const sl = $("#sleep"); sl.classList.remove("on"); sl.setAttribute("aria-hidden", "true");
+  clearInterval(clockT); stopBreath(); stopMonitor();
+}
+function wakeUp() {
+  const dawn = $("#dawn"); dawn.classList.add("on");
+  setTimeout(() => { endSleep(); applyPhase("wake"); go("report"); }, 2300);
+  setTimeout(() => dawn.classList.remove("on"), 3300);
+}
+
+/* ---------- ฟังเสียงในห้อง (หาเสียงกรน) ระหว่างโหมดหลับ ----------
+   ไมค์จริงเมื่อเบราว์เซอร์ให้สิทธิ์ (เว็บ https หรือ localhost) · ใช้ไมค์ไม่ได้ (ลิงก์ claude.ai, ไม่อนุญาต) = ข้อมูลตัวอย่าง มีป้ายบอกเสมอ
+   วิเคราะห์เฉพาะระดับเสียงในเครื่อง ไม่อัด ไม่เก็บ และไม่ส่งเสียงไปไหน เก็บแค่ตัวเลข · dB เป็นค่าประมาณ (ไมค์มือถือไม่ได้สอบเทียบ: dBFS + 94) */
+/* SNORE-DET-BEGIN — ฟังก์ชันล้วน ไม่แตะหน้าเว็บ ทดสอบด้วย node tools/test_snore.js
+   เสียงกรน = ดังกว่าพื้นเสียงห้อง 7 dB ขึ้นไป · เสียงทุ้ม (พลังงาน 60–500 Hz มากกว่า 500–4000 Hz) · ยาว 0.3–3.5 วินาที
+   และมาเป็นจังหวะหายใจ (ห่างกัน 2–9 วินาที) ติดกันอย่างน้อย 3 ครั้ง · ห่างจากครั้งก่อนเกิน 60 วินาที = เริ่มช่วงกรนใหม่
+   เสียงสม่ำเสมอ (แอร์ Brown noise) = พื้นเสียงห้อง ไม่นับ · เสียงดังครั้งเดียว (ประตู รถ) = ไม่เป็นจังหวะ ไม่นับ */
+function snoreDet() {
+  const d = { floor: 0, burst: null, rb: [], run: 0, count: 0, eps: 0, lastSn: -1e9, snMax: 0 };
+  /* t = วินาทีนับจากเริ่ม · db = ระดับเสียง · ratio = เสียงทุ้ม/เสียงแหลม · เรียกราว 10 ครั้งต่อวินาที · คืนรายการครั้งที่เพิ่งยืนยันว่าเป็นกรน */
+  d.push = (t, db, ratio) => {
+    d.floor = !d.floor ? db : db < d.floor ? d.floor * 0.8 + db * 0.2 : d.floor + 0.01;
+    const b = d.burst;
+    if (!b) { if (db > d.floor + 7 && ratio > 1.2) d.burst = { t, pk: db }; return []; }
+    b.pk = Math.max(b.pk, db);
+    if (db >= d.floor + 4) return [];
+    d.burst = null;
+    const dur = t - b.t;
+    if (dur < 0.3 || dur > 3.5) { d.run = 0; d.rb = []; return []; }
+    const prev = d.rb[d.rb.length - 1], gap = prev ? b.t - prev.t : 99;
+    d.run = gap >= 2 && gap <= 9 ? d.run + 1 : 1;
+    d.rb = (d.run === 1 ? [] : d.rb.slice(-2)).concat(b);
+    if (d.run < 3) return [];
+    const added = d.rb.filter((x) => !x.sn);
+    added.forEach((x) => { x.sn = 1; d.count++; if (x.t - d.lastSn > 60) d.eps++; d.lastSn = x.t; d.snMax = Math.max(d.snMax, x.pk); });
+    return added;
+  };
+  return d;
+}
+/* สรุปทั้งคืนแบบย่อ (เก็บลงโปรไฟล์ได้ ราว 200 ไบต์) · mins[นาที] = [ดังสุด dB, ครั้งที่กรน] หรือว่าง = นาทีที่ไม่ได้ฟัง
+   tl = เส้นเวลา ≤ 48 ช่อง ช่องละ step นาที: "-" ไม่ได้ฟัง · 0–9 = สัดส่วนนาทีที่กรนในช่องนั้น */
+function snoreSummary(real, t0, secs, mins, det) {
+  const minutes = Math.round(secs / 60), n = mins.length, step = Math.max(1, Math.ceil(n / 48)), tl = [];
+  let snoreMin = 0;
+  mins.forEach((x) => { if (x && x[1]) snoreMin++; });
+  snoreMin = Math.min(snoreMin, minutes); /* ฟังไม่ถึง 1 นาที = 0 (หน้าผลแสดง <1 ถ้ามีกรน) */
+  for (let i = 0; i < n; i += step) {
+    let heard = 0, sn = 0;
+    for (let j = i; j < Math.min(n, i + step); j++) if (mins[j]) { heard++; if (mins[j][1]) sn++; }
+    tl.push(heard ? String(Math.ceil((sn / heard) * 9)) : "-");
+  }
+  const d0 = new Date(t0), pad = (x) => String(x).padStart(2, "0");
+  return {
+    real: !!real, start: `${pad(d0.getHours())}:${pad(d0.getMinutes())}`, minutes, count: det.count, episodes: det.eps, snoreMin,
+    maxDb: Math.round(det.snMax), floorDb: Math.round(det.floor), level: det.count === 0 ? "none" : snoreMin / Math.max(1, minutes) < 0.1 ? "mild" : "often",
+    tl: tl.join(""), step,
+  };
+}
+/* หักคะแนนการนอนตามสัดส่วนเวลาที่กรน: กรน 10% ของเวลาที่ฟัง = หัก 5 · สูงสุด 15 · ฟังไม่ถึง 30 นาที = ยังไม่หัก */
+const snorePenalty = (s) => (!s || !(s.minutes >= 30) ? 0 : Math.min(15, Math.round((s.snoreMin / s.minutes) * 50)));
+/* SNORE-DET-END */
+function sampleNight() { /* ข้อมูลตัวอย่างทั้งคืน 23:00–07:00 ตรงกับหน้าผล (ใช้เมื่อไม่ได้วัดจากไมค์จริง) */
+  const tl = Array(48).fill("0");
+  [[13, 4], [14, 9], [15, 9], [16, 5], [31, 6], [32, 9], [33, 3], [40, 2]].forEach(([i, v]) => (tl[i] = String(v)));
+  return { real: false, start: "23:00", minutes: 480, count: 412, episodes: 4, snoreMin: 38, maxDb: 58, floorDb: 33, level: "mild", tl: tl.join(""), step: 10 };
+}
+
+const MON = { on: false, paused: false, real: false, sum: null };
+const MON_NOTE = "ไม่อัดเสียง เก็บแค่ตัวเลขในเครื่องนี้";
+function monLabel(src, cls, note) {
+  const s = $("#mon-src"); s.textContent = src; s.className = cls || "";
+  $("#mon-note").textContent = note || MON_NOTE;
+}
+function monUI() {
+  const p = MON.paused;
+  $("#mon-t").textContent = p ? "ฟังเสียงต่อ" : "หยุดฟังเสียง";
+  $("#mon-h").textContent = p ? "หยุดฟังเสียงชั่วคราว" : "กำลังฟังเสียงในห้อง";
+  $("#mon").classList.toggle("paused", p);
+  battShow();
+}
+function monRelease() { /* ปิดไมค์ทุกทาง: track, AudioContext, wake lock, ตัวจับเวลา */
+  clearInterval(MON.iv); MON.iv = 0;
+  if (MON.stream) MON.stream.getTracks().forEach((t) => t.stop());
+  if (MON.ctx) MON.ctx.close().catch(() => {});
+  if (MON.wake) MON.wake.release().catch(() => {});
+  Object.assign(MON, { ctx: null, an: null, wake: null }); /* เก็บ MON.stream ไว้ตรวจได้ว่า track ปิดแล้ว (readyState = ended) */
+}
+function monRun() { MON.last = Date.now(); clearInterval(MON.iv); MON.iv = setInterval(monTick, 100); }
+const SAMPLE_NOTE = "ตัวอย่างเท่านั้น ไม่ได้วัดจริง";
+async function startMonitor(resume) {
+  monRelease();
+  if (!resume) Object.assign(MON, { on: true, real: false, t0: Date.now(), det: snoreDet(), mins: [], hist: {}, secs: 0, cur: 0, n: 0, sum: null, stream: null });
+  MON.paused = false; monUI();
+  let ctx = null; /* สร้างตอนแตะปุ่ม (เบราว์เซอร์ให้เริ่มเสียงได้เฉพาะจากการแตะ) */
+  try { const AC = window.AudioContext || window.webkitAudioContext; ctx = AC ? new AC() : null; } catch (e) { ctx = null; }
+  const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+  const blocked = !window.isSecureContext || !ctx || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||
+    (document.featurePolicy && !document.featurePolicy.allowsFeature("microphone"));
+  const sample = (why) => {
+    if (ctx) ctx.close().catch(() => {});
+    MON.real = false;
+    monLabel("ข้อมูลตัวอย่าง (เครื่องนี้เปิดไมค์ไม่ได้)", "demo", `${SAMPLE_NOTE} · ${why}`);
+    monRun();
+  };
+  if (resume && !MON.real) return sample("ลิงก์นี้หรือเบราว์เซอร์นี้ไม่ให้ใช้ไมค์");
+  if (blocked) return sample("ลิงก์นี้หรือเบราว์เซอร์นี้ไม่ให้ใช้ไมค์ เปิดแอปจากเว็บของทีมเพื่อวัดจากมือถือ");
+  monLabel("กำลังขอใช้ไมค์…", "");
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    if (!MON.on || MON.paused) { stream.getTracks().forEach((t) => t.stop()); ctx.close().catch(() => {}); return; }
+    const an = ctx.createAnalyser(); an.fftSize = 2048; an.smoothingTimeConstant = 0.2;
+    ctx.createMediaStreamSource(stream).connect(an);
+    if (ctx.state === "suspended") await ctx.resume().catch(() => {});
+    Object.assign(MON, { real: true, ctx, stream, an, td: new Float32Array(an.fftSize), fd: new Float32Array(an.frequencyBinCount) });
+    try { MON.wake = navigator.wakeLock ? await navigator.wakeLock.request("screen") : null; } catch (e) { MON.wake = null; }
+    monLabel("วัดจากไมค์เครื่องนี้", "real", `วางห่างหัวเตียงราว 50 ซม. · ${MON.wake ? "จอเปิดค้างไว้ระหว่างฟัง" : "เปิดจอค้างไว้ จอดับแล้วการฟังจะหยุด"} · ${MON_NOTE}`);
+    monRun();
+  } catch (e) {
+    if (!MON.on || MON.paused) { ctx.close().catch(() => {}); return; }
+    if (resume) { ctx.close().catch(() => {}); MON.paused = true; monUI(); return monLabel("เปิดไมค์ต่อไม่ได้", "", "อนุญาตไมค์ในเบราว์เซอร์แล้วแตะ ฟังเสียงต่อ อีกครั้ง"); }
+    sample(inFrame ? "ลิงก์นี้ไม่ให้ใช้ไมค์ เปิดแอปจากเว็บของทีมเพื่อวัดจากมือถือ" : "ไม่ได้อนุญาตไมค์ อนุญาตในเบราว์เซอร์แล้วเริ่มค่ำคืนใหม่");
+  }
+}
+function monToggle() {
+  if (!MON.on) return;
+  if (!MON.paused) { monRelease(); MON.paused = true; monUI(); monLabel(MON.real ? "หยุดแล้ว ปิดไมค์แล้ว" : "ข้อมูลตัวอย่าง (เครื่องนี้เปิดไมค์ไม่ได้)", MON.real ? "" : "demo", MON.real ? MON_NOTE : SAMPLE_NOTE); return; }
+  startMonitor(true);
+}
+function monLevel(t) { /* [dB โดยประมาณ, เสียงทุ้ม/เสียงแหลม] */
+  if (MON.real) {
+    MON.an.getFloatTimeDomainData(MON.td);
+    let s = 0; for (let i = 0; i < MON.td.length; i++) s += MON.td[i] * MON.td[i];
+    const db = 20 * Math.log10(Math.sqrt(s / MON.td.length) + 1e-9) + 94;
+    MON.an.getFloatFrequencyData(MON.fd);
+    const hz = MON.ctx.sampleRate / MON.an.fftSize; let lo = 0, hi = 0;
+    for (let i = 1; i < MON.fd.length; i++) { const f = i * hz, p = Math.pow(10, MON.fd[i] / 10); if (f >= 60 && f < 500) lo += p; else if (f >= 500 && f < 4000) hi += p; }
+    return [clamp(db, 20, 100), lo / (hi + 1e-12)];
+  }
+  /* ข้อมูลตัวอย่าง วนทุก 90 วินาที: เงียบ → กรนเป็นจังหวะ 30 วินาที → รถผ่าน 1 ครั้ง (ไม่เป็นจังหวะ ไม่นับเป็นกรน) */
+  const c = t % 90, jit = Math.sin(MON.n * 12.9898) * 0.8, ph = (c - 8) % 3.8;
+  if (c >= 8 && c < 40 && ph < 1.1) return [44 + 7 * Math.sin((ph / 1.1) * Math.PI) + jit, 3];
+  if (c >= 55 && c < 59) return [55 + jit, 3];
+  return [31 + jit, 1];
+}
+function monTick() {
+  const now = Date.now(), t = (now - MON.t0) / 1000, [db, ratio] = monLevel(t), sec = Math.floor(t), m = Math.floor(t / 60);
+  MON.secs += Math.min(1, (now - MON.last) / 1000); MON.last = now;
+  MON.n++; MON.cur = MON.cur ? MON.cur * 0.6 + db * 0.4 : db;
+  if (!MON.mins[m]) MON.mins[m] = [0, 0];
+  MON.mins[m][0] = Math.max(MON.mins[m][0], Math.round(db));
+  if (!MON.hist[sec]) { MON.hist[sec] = [db, 0]; delete MON.hist[sec - 60]; } else MON.hist[sec][0] = Math.max(MON.hist[sec][0], db);
+  MON.det.push(t, db, ratio).forEach((x) => {
+    const s = Math.floor(x.t), mm = Math.floor(x.t / 60);
+    if (MON.hist[s]) MON.hist[s][1] = 1;
+    if (!MON.mins[mm]) MON.mins[mm] = [0, 0];
+    MON.mins[mm][1]++;
+  });
+  if (MON.n % 5 === 0) monDraw();
+}
+function monDraw() {
+  const N = 40, now = Math.floor((Date.now() - MON.t0) / 1000);
+  let h = "";
+  for (let s = now - N + 1; s <= now; s++) {
+    const v = MON.hist[s], p = v ? clamp((v[0] - 26) / 34, 0.06, 1) : 0.06;
+    h += `<i${v && v[1] ? ' class="sn"' : ""} style="height:${Math.round(p * 100)}%"></i>`;
+  }
+  $("#mon-bars").innerHTML = h;
+  $("#mon-db").textContent = `${Math.round(MON.cur)} dB`;
+  const d = MON.det;
+  $("#mon-sn").textContent = d.count ? `กรน ${d.count} ครั้ง · ดังสุด ${Math.round(d.snMax)} dB` : "ยังไม่พบเสียงกรน";
+}
+function stopMonitor() {
+  if (!MON.on) return;
+  monRelease(); MON.on = false; MON.paused = false;
+  MON.sum = snoreSummary(MON.real, MON.t0, MON.secs, MON.mins, MON.det);
+  MON.hist = {};
+}
+document.addEventListener("visibilitychange", async () => { /* จอกลับมา: ขอให้จอเปิดค้างอีกครั้ง */
+  if (MON.on && !MON.paused && MON.real && document.visibilityState === "visible" && navigator.wakeLock) { try { MON.wake = await navigator.wakeLock.request("screen"); } catch (e) { /* ไม่เป็นไร */ } }
+});
+window.addEventListener("pagehide", () => stopMonitor()); /* ปิดแท็บหรือออกจากหน้า = ปิดไมค์ */
+
+/* ---------- เตือนชาร์จแบตระหว่างฟังเสียง ----------
+   navigator.getBattery() มีเฉพาะ Chrome/Android: ไม่ได้เสียบสาย หรือแบตต่ำกว่า 30% = เตือนชัดขึ้น · กำลังชาร์จ = บอกสั้น ๆ
+   อ่านไม่ได้ (iPhone, Safari, Firefox) = เตือนทั่วไปทุกครั้ง */
+const BATT = { b: null, asked: false };
+const BATT_MSG = "เสียบชาร์จไว้ทั้งคืน การฟังเสียงใช้แบตตลอดคืน";
+async function checkBattery() {
+  if (!BATT.asked) {
+    BATT.asked = true;
+    try { BATT.b = navigator.getBattery ? await navigator.getBattery() : null; } catch (e) { BATT.b = null; }
+    if (BATT.b) { BATT.b.addEventListener("chargingchange", battShow); BATT.b.addEventListener("levelchange", battShow); }
+  }
+  battShow();
+}
+function battShow() {
+  const el = $("#batt"), b = BATT.b;
+  if (!$("#sleep").classList.contains("on") || !MON.on || MON.paused) { el.className = "batt"; el.innerHTML = ""; return; }
+  const pct = b ? Math.round(b.level * 100) : 0;
+  const [cls, msg] = !b ? ["batt", BATT_MSG] : b.charging ? ["batt ok", `กำลังชาร์จ ${pct}%`]
+    : pct < 30 ? ["batt warn", `แบตเหลือ ${pct}% เสียบชาร์จก่อนนอน ไม่งั้นฟังเสียงไม่ครบคืน`] : ["batt warn", `แบต ${pct}% ยังไม่ได้เสียบสาย · ${BATT_MSG}`];
+  el.className = cls; el.innerHTML = ico("i-batt") + `<span>${msg}</span>`;
+}
+
+let toastT = 0;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 3200);
+}
+
+/* ---------- ผลการนอน (ข้อมูลตัวอย่าง 1 คืน: 23:00–07:00 = 480 นาที) ---------- */
+/* [นาทีที่เริ่ม, ยาวกี่นาที, ช่วง] W ตื่น · R REM · L หลับตื้น · D หลับลึก — รวม ตื่น 29 / REM 99 / ตื้น 271 / ลึก 81 */
+const SEG = [[0, 12, "W"], [12, 18, "L"], [30, 34, "D"], [64, 16, "L"], [80, 14, "R"], [94, 22, "L"], [116, 26, "D"], [142, 24, "L"],
+  [166, 20, "R"], [186, 30, "L"], [216, 14, "D"], [230, 28, "L"], [258, 22, "R"], [280, 9, "W"], [289, 36, "L"], [325, 7, "D"],
+  [332, 30, "L"], [362, 23, "R"], [385, 40, "L"], [425, 20, "R"], [445, 27, "L"], [472, 8, "W"]];
+const ST = { W: { row: 0, th: "ตื่น", c: "var(--st-wake)" }, R: { row: 1, th: "REM", c: "var(--st-rem)" }, L: { row: 2, th: "หลับตื้น", c: "var(--st-light)" }, D: { row: 3, th: "หลับลึก", c: "var(--st-deep)" } };
+const SUM = SEG.reduce((s, [, d, st]) => ((s[st] += d), s), { W: 0, R: 0, L: 0, D: 0 });
+const pct = (k) => Math.round((SUM[k] / (SUM.R + SUM.L + SUM.D)) * 100);
+const LOG = [
+  ["21:00", "เริ่มช่วงผ่อนคลาย", "2700 K 150 lux · Sound bath 35 dB(A) · ลาเวนเดอร์", "on"],
+  ["22:00", "เตรียมนอน", "หรี่เหลือ 30 lux 2200 K · เปลี่ยนเป็น Brown noise", ""],
+  ["23:00", "ปิดไฟ ห้องเข้าโหมดหลับ", "ห้อง 24°C · ในผ้าห่ม 33°C · Brown noise 45 dB(A)", "on"],
+  ["23:42", "เครื่องหอมปิดเอง", "30 นาทีหลังคุณหลับ (หลับตอน 23:12)", ""],
+  ["02:00", "แอร์ขึ้นเป็น 25°C", "ช่วงท้ายคืนร่างกายคุมอุณหภูมิได้น้อย ห้องจึงอุ่นขึ้นไม่ให้หนาว", ""],
+  ["03:40", "เสียงรถข้างนอก 58 dB(A)", "เพิ่ม Brown noise เป็น 48 dB(A) 20 นาที · คุณตื่น 9 นาที", "alert"],
+  ["06:30", "แสงอรุณเริ่ม", "0 → 250 lux · 2000 → 5000 K · แอร์ 26°C", "on"],
+];
+const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)} ชม. ${m % 60} นาที` : `${m} นาที`);
+function renderLog() {
+  $("#log").innerHTML = LOG.map(([t, h, s, c]) => `<li><time>${t}</time><span class="d ${c}"></span><p>${h}<small>${s}</small></p></li>`).join("");
+}
+function renderLegend() {
+  $("#legend").innerHTML = ["D", "L", "R", "W"].map((k) => {
+    const big = k === "W" ? SUM.W + " นาที" : pct(k) + "%";
+    const sub = k === "W" ? "รวมก่อนหลับ" : hm(SUM[k]);
+    return `<div><span><i style="background:${ST[k].c}"></i>${ST[k].th}</span><b>${big}</b><span>${sub}</span></div>`;
+  }).join("");
+}
+function renderHyp() {
+  const host = $("#hyp"), w = Math.round(host.clientWidth);
+  if (!w) return;
+  const left = 58, right = 4, top = 4, rowH = 36, barH = 20, H = top + rowH * 4 + 24;
+  const x = (m) => left + (m / 480) * (w - left - right);
+  const cy = (s) => top + ST[s].row * rowH + rowH / 2;
+  let g = "";
+  Object.keys(ST).forEach((k) => {
+    g += `<text x="0" y="${cy(k) + 4}">${ST[k].th}</text><line class="grid-l" x1="${left}" x2="${w - right}" y1="${cy(k)}" y2="${cy(k)}"/>`;
+  });
+  SEG.forEach(([s0, , st], i) => {
+    if (!i) return;
+    const xa = x(s0).toFixed(1);
+    g += `<line class="conn" x1="${xa}" x2="${xa}" y1="${cy(SEG[i - 1][2])}" y2="${cy(st)}"/>`;
+  });
+  SEG.forEach(([s0, d, st]) => {
+    g += `<rect x="${x(s0).toFixed(1)}" y="${cy(st) - barH / 2}" width="${Math.max(2, x(s0 + d) - x(s0) - 1).toFixed(1)}" height="${barH}" rx="4" style="fill:${ST[st].c}"/>`;
+  });
+  ["23:00", "01:00", "03:00", "05:00", "07:00"].forEach((t, i) => {
+    const anchor = i === 0 ? "start" : i === 4 ? "end" : "middle";
+    g += `<text class="tick" x="${x(i * 120).toFixed(1)}" y="${H - 4}" text-anchor="${anchor}">${t}</text>`;
+  });
+  host.innerHTML = `<svg viewBox="0 0 ${w} ${H}" width="${w}" height="${H}" aria-hidden="true">${g}</svg>`;
+}
+const RING = 2 * Math.PI * 60, SCORE = 92; /* SCORE = คะแนนตัวอย่างก่อนหักเสียงกรน */
+
+/* ---------- เสียงกรน: การ์ดในหน้าผล + หักคะแนน ----------
+   คืนที่วัดจากไมค์จริง = ใช้ผลจริง (MON.sum) · ไม่ได้วัดจริง = ข้อมูลตัวอย่างทั้งคืน (sampleNight) มีป้ายบอก */
+const SN = { cur: null };
+const SN_LV = { none: "ไม่พบเสียงกรน", mild: "กรนเล็กน้อย", often: "กรนบ่อย" };
+const curSnore = () => SN.cur || (SN.cur = MON.sum && MON.sum.real ? MON.sum : sampleNight());
+const scoreNow = () => SCORE - snorePenalty(curSnore());
+const durTH = (m) => (m < 1 ? "ไม่ถึง 1 นาที" : hm(m));
+const durShort = (m) => (m < 1 ? "<1 นาที" : m < 60 ? `${m} นาที` : `${Math.floor(m / 60)} ชม.${m % 60 ? ` ${m % 60} น.` : ""}`);
+function snoreText(s) {
+  const tail = s.real ? "" : " (ตัวอย่าง)";
+  return s.count ? `${s.minutes < 30 ? "ฟังสั้น" : SN_LV[s.level]} · ${s.snoreMin || "<1"} นาทีจาก ${durTH(s.minutes)} · ${s.count} ครั้ง · ดังสุด ${s.maxDb} dB${tail}`
+    : `ไม่พบเสียงกรน · ฟัง ${durTH(s.minutes)} · พื้นห้อง ${s.floorDb} dB${tail}`;
+}
+function snoreLine(s) { /* เส้นเวลาทั้งคืน: ช่องละ step นาที · สูง = สัดส่วนนาทีที่กรน · เส้นประ = ช่วงที่ไม่ได้ฟัง */
+  const host = $("#sn-line"), w = Math.round(host.clientWidth);
+  if (!w) return;
+  const tl = String(s.tl || ""), n = tl.length || 1, H = 52, base = 32, cw = w / n;
+  const [h0, m0] = String(s.start || "23:00").split(":").map(Number), t0 = (h0 || 0) * 60 + (m0 || 0), span = n * (s.step || 1);
+  let g = `<rect class="trk" x="0" y="${base}" width="${w}" height="2" rx="1"/>`;
+  [...tl].forEach((c, i) => {
+    const x = (i * cw).toFixed(1), bw = Math.max(1, cw - (cw > 4 ? 2 : 0.5)).toFixed(1);
+    if (c === "-") g += `<line class="off" x1="${x}" x2="${(i * cw + cw).toFixed(1)}" y1="${base + 1}" y2="${base + 1}"/>`;
+    else if (+c > 0) { const h = Math.max(3, (+c / 9) * 28); g += `<rect class="hit" x="${x}" y="${(base - h).toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="1.5"/>`; }
+  });
+  (span < 4 ? [[0, "start"], [1, "end"]] : [[0, "start"], [0.5, "middle"], [1, "end"]]).forEach(([f, a]) => {
+    g += `<text x="${(f * w).toFixed(1)}" y="${H - 4}" text-anchor="${a}">${hhmm(Math.round(t0 + f * span) % 1440)}</text>`;
+  });
+  host.innerHTML = `<svg viewBox="0 0 ${w} ${H}" width="${w}" height="${H}" aria-hidden="true">${g}</svg>`;
+  host.setAttribute("aria-label", `เส้นเวลาเสียงกรน ${hhmm(t0)} ถึง ${hhmm((t0 + span) % 1440)}: ${snoreText(s)}`);
+}
+function renderSnore() {
+  SN.cur = MON.sum && MON.sum.real ? MON.sum : sampleNight();
+  const s = SN.cur, pen = snorePenalty(s), short = s.minutes < 30, loud = s.maxDb >= 60;
+  const src = $("#sn-src"); src.textContent = s.real ? "วัดจากไมค์เครื่องนี้" : "ข้อมูลตัวอย่าง";
+  $("#sn-stats").innerHTML = [[s.count, "ครั้ง", ["กรน", `${s.episodes} ช่วง`]], [s.snoreMin || (s.count ? "<1" : 0), "นาที", ["โดยประมาณ", `จาก ${durShort(s.minutes)}`]],
+    [s.count ? s.maxDb : "–", "dB", ["ดังสุด", `เงียบสุด ${s.floorDb}`]]]
+    .map(([v, u, sub]) => `<div><b>${esc(v)}</b><span>${u}</span>${sub.map((x) => `<small>${esc(x)}</small>`).join("")}</div>`).join("");
+  snoreLine(s);
+  const tip = s.level === "none" ? "ไม่พบเสียงกรนที่ดังเป็นจังหวะตลอดช่วงที่ฟัง"
+    : s.level === "often" || loud ? "กรนบ่อยหรือดัง แนะนำให้ลองนอนตะแคงและยกหัวเตียงเล็กน้อย และปรึกษาแพทย์เรื่องการหายใจขณะหลับ โดยเฉพาะถ้าตื่นมายังง่วง หรือมีคนเห็นว่าหยุดหายใจเป็นช่วง ๆ"
+    : "กรนเบา ๆ เป็นช่วงสั้น พบได้ทั่วไป ลองนอนตะแคงและงดแอลกอฮอล์ก่อนนอน";
+  $("#sn-tip").innerHTML = (short && s.real ? `<span class="sn-short">ฟังไปเพียง ${durTH(s.minutes)} ผลยังไม่พอสรุป ลองฟังทั้งคืนเพื่อดูผลจริง</span><br>` : esc(tip) + " · ") + (s.real ? "ค่าประมาณจากระดับเสียงที่ไมค์มือถือได้ยิน ไม่ใช่การวินิจฉัย" : "ข้อมูลตัวอย่าง ไม่ได้วัดจริง เปิดแอปจากเว็บของทีมบนมือถือเพื่อวัดจากไมค์");
+  const sc = scoreNow();
+  $("#grade").textContent = sc >= 85 ? "ดีมาก" : sc >= 70 ? "ดี" : "พอใช้";
+  $("#score-adj").innerHTML = (pen ? `<b>หัก ${pen} คะแนนจากเสียงกรน</b> (กรน ${s.snoreMin} จาก ${s.minutes} นาที${s.real ? "" : " ตัวอย่าง"})`
+    : short ? "ยังไม่หักคะแนนจากเสียงกรน เพราะฟังไม่ถึง 30 นาที" : "ไม่หักคะแนนจากเสียงกรน") + ` · คะแนนตั้งต้น ${SCORE} และส่วนอื่นของผลยังเป็นข้อมูลตัวอย่าง`;
+}
+function animateScore() {
+  const SC = scoreNow(), bar = $("#ring-bar"), n = $("#score-n"), end = RING * (1 - SC / 100);
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { bar.style.strokeDashoffset = end; n.textContent = SC; return; }
+  bar.style.transition = "none"; bar.style.strokeDashoffset = RING; bar.getBoundingClientRect();
+  requestAnimationFrame(() => { bar.style.transition = ""; bar.style.strokeDashoffset = end; });
+  const t0 = performance.now();
+  const stepN = (now) => { const p = Math.min(1, (now - t0) / 1500); n.textContent = Math.round(SC * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(stepN); };
+  requestAnimationFrame(stepN);
+}
+
+/* ---------- แผนกลับบ้าน ---------- */
+const KIT = [
+  ["i-diffuser", "Night Mist Diffuser", "เครื่องพ่นไอหอมตั้งเวลา ปิดเองหลังหลับ 30 นาที"],
+  ["i-bottle", "Lavender Night Oil", "กลิ่นเดียวกับที่ใช้ในห้องเมื่อคืน"],
+  ["i-lamp", "Dawn Light", "โคมแสงปลุก 2000 → 5000 K ตั้งเวลาเหมือนใน Sleep Lab"],
+];
+function renderPlan() {
+  const per = PERSONAS[S.P.p], d = resolved("deep"), w = resolved("wind");
+  $("#plan-lead").textContent = `แผนของ ${per.en} · ${per.th} ออกแบบจากผลเมื่อคืนและแบบประเมินของคุณ เริ่มใช้ที่บ้านได้คืนนี้`;
+  const els = [
+    ["i-sun", "Light", "อุ่นและสลัว", `${w.light.k} K ก่อนนอน 1 ชม. แล้ว${d.light.lux > 0 ? "เหลือแสงสลัว 1800 K ตอนหลับ" : "ปิดมืดสนิทตอนหลับ"}`],
+    ["i-sound", "Sound", soundText(d.sound).replace(" · ", " "), "เปิดจากลำโพงที่ห่างหัวเตียงราว 1 เมตร"],
+    ["i-leaf", "Scent", w.scent.type === "off" ? "ไม่ใช้กลิ่น" : SCENTS[w.scent.type].th, "3–4 หยดในเครื่องพ่น ตั้งปิดเองหลังหลับ 30 นาที"],
+    ["i-temp", "Temp", `${S.T}° → ${lateT()}° → ${wakeT()}°C`, "หลับลึกดีที่สุดราว 24–26°C ความชื้น 50–60% ตั้งโหมด Sleep ให้แอร์อุ่นขึ้นเองช่วงดึก"],
+    ["i-bed", "Bed", `ในผ้าห่ม ${S.B}°C`, `ที่นอน${FIRM[S.bed.firm]} ผ้าห่มอุ่นพอดีในห้องที่เย็นสบาย หมอนสูงพอให้คอตรงแนวหลัง`],
+  ];
+  $("#els").innerHTML = els.map(([i, en, v, tip]) => `<div class="el"><span class="ic">${ico(i)}</span><div><small>${en}</small><b>${esc(v)}</b><p>${tip}</p></div></div>`).join("");
+  $("#kit").innerHTML = KIT.map(([i, n, dd]) => `<div class="kit-i"><span class="ic">${ico(i)}</span><div><b>${n}</b><p>${dd}</p></div></div>`).join("");
+  renderRoutine();
+}
+function renderRoutine() {
+  const P = S.P, t = S.T, d = resolved("deep").sound, snd = d.type === "quiet" ? "ห้องเงียบ" : `${SOUNDS[d.type].th} ${d.db} dB(A)`;
+  const first = P.p === "B" || P.s === "B" ? ["อาบน้ำอุ่น 40–42°C", "10–15 นาที ก่อนนอน 1–2 ชั่วโมง ช่วยให้หลับเร็วขึ้น"] : ["จดเรื่องที่ค้างในหัวลงกระดาษ", "วางความคิดไว้ก่อน พรุ่งนี้ค่อยหยิบกลับมา"];
+  const A = [
+    ["21:00", ...first], ["21:30", "หรี่ไฟเป็น 2700 K", "เปิดกลิ่นลาเวนเดอร์ในห้องนอน"],
+    ["22:00", "วางมือถือไว้นอกห้องนอน", "ยืดเหยียดเบา ๆ 10 นาที"], ["22:40", "หายใจ 4-7-8 สี่รอบบนเตียง", "เข้า 4 · กลั้น 7 · ออก 8"],
+    ["23:00", "ปิดไฟ", `${snd} · แอร์ ${t}°C`], [hhmm(S.wakeAt - 30), "แสงปลุกค่อย ๆ สว่าง", "ร่างกายตื่นเองตอนหลับตื้น"],
+    [hhmm(S.wakeAt), "ตื่น เปิดม่านรับแสงเช้า 10 นาที", "ตั้งเวลาเดิมทุกวัน รวมวันหยุด"],
+  ];
+  const B = [
+    ["23:30", "อาบน้ำอุ่นสั้น ๆ 5 นาที", `เปิดแอร์ ${t}°C รอไว้ก่อน`], ["23:45", "แสงสลัว 2200 K", "ไม่เปิดจออีก · กลิ่นลาเวนเดอร์"],
+    ["23:55", "หายใจ 4-7-8 สองรอบ", "ช่วยให้หัวเงียบเร็วขึ้น"], ["00:00", "ปิดไฟ", snd],
+    [hhmm(S.wakeAt), "ตื่นเวลาเดิม", "รับแสงเช้าทันที นาฬิกาในร่างกายจะไม่คลาด"],
+  ];
+  $("#routine").innerHTML = (S.ab === "A" ? A : B).map(([tm, h, s]) => `<li><time>${tm}</time><p>${h}<small>${s}</small></p></li>`).join("");
+  $("#routine-note").textContent = S.ab === "A" ? `เข้านอน 23:00 · ตื่น ${hhmm(S.wakeAt)}` : "นอนช้าได้ แต่ตื่นเวลาเดิม";
+}
+
+/* ---------- บันทึกค่าห้องรายคน: ฐานข้อมูลของหน้า (ทีมเห็นร่วมกัน) · เปิดนอก claude.ai = เก็บในเครื่อง ---------- */
+const REC = { col: null, items: [], local: [], state: "loading" };
+const SAVE = { src: "room", attach: true, name: "" };
+const TH_M = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const fmtDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : `${d.getDate()} ${TH_M[d.getMonth()]} ${hhmm(d.getHours() * 60 + d.getMinutes())}`; };
+const sumHTML = (rows) => `<dl class="sum">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`;
+function summaryRows() {
+  const w = resolved("wind"), d = resolved("deep");
+  return [
+    ["อุณหภูมิห้อง", S.temp.smart ? `${S.T}° → ${lateT()}° → ${wakeT()}°C · ชื้น ${HUMID}%` : `${S.T}°C ทั้งคืน · ชื้น ${HUMID}%`],
+    ["ในผ้าห่ม", `${S.B}°C · ที่นอน${FIRM[S.bed.firm]}`],
+    ["แสงก่อนนอน", lightText(w.light)],
+    ["แสงตอนหลับ", (d.light.lux === 0 ? "มืดสนิท" : `สลัว ${d.light.lux} lux · ${d.light.k} K`) + curText(d.light)],
+    ["เสียงตอนหลับ", soundText(d.sound)],
+    ["กลิ่น", scentText(w.scent, S.scent.auto)],
+    ["ปลุก", `${WAKES[S.wake].th} · ตื่น ${hhmm(S.wakeAt)}`],
+  ];
+}
+function saveSheet() {
+  const rep = SAVE.src === "report";
+  return head("i-save", rep ? "บันทึกผลคืนนี้ลงโปรไฟล์" : SAVE.src === "plan" ? "บันทึกแผนและค่าห้อง" : "บันทึกค่าห้อง") +
+    `<div class="field"><label class="lbl" for="save-name">ชื่อเล่นหรือรหัสลูกค้า</label>
+      <input class="inp txt" id="save-name" maxlength="40" autocomplete="off" placeholder="เช่น คุณแตม หรือ KD-0921" value="${esc(SAVE.name)}">
+      <p class="err" id="save-err" role="alert"></p></div>
+    <div class="field"><div class="field-h"><span>ค่าที่จะบันทึก</span><b>${esc(PERSONAS[S.P.p].en)}</b></div>${sumHTML(summaryRows())}</div>` +
+    (rep ? swF("s-attach", "แนบผลการนอนเมื่อคืน", `Sleep score ${scoreNow()} · หลับลึก ${pct("D")}% (ตัวอย่าง) · ${snoreText(curSnore())}`, SAVE.attach) : "") +
+    `<div class="field"><label class="lbl" for="save-note">หมายเหตุถึง Night Designer (ถ้ามี)</label>
+      <textarea class="inp area" id="save-note" rows="2" maxlength="200" placeholder="เช่น ตอนเข้านอนอยากเย็นกว่านี้นิดหนึ่ง"></textarea></div>
+    <p class="hint">ทีมที่เปิดลิงก์นี้เห็นรายการร่วมกัน ใช้ชื่อเล่นหรือรหัสแทนชื่อจริงได้</p>
+    <button class="btn" type="button" id="save-ok">${ico("i-save")}บันทึกและส่งให้ทีม</button>`;
+}
+function buildRecord(name, note) {
+  const w = resolved("wind"), d = resolved("deep");
+  return JSON.parse(JSON.stringify({
+    name, note, room: "03", source: SAVE.src, savedAt: new Date().toISOString(),
+    preset: S.P.code, persona: S.P.p, persona2: S.P.s || "",
+    summary: summaryRows().map(([k, v]) => ({ k, v })),
+    values: {
+      roomC: { sleep: S.T, late: lateT(), beforeWake: wakeT(), smart: S.temp.smart, humidity: HUMID },
+      inBedC: S.B, firm: S.bed.firm, windLight: w.light, sleepLight: d.light, sleepSound: d.sound,
+      scent: { ...w.scent, autoOff: S.scent.auto }, wake: { method: S.wake, at: hhmm(S.wakeAt) },
+    },
+    state: { T: S.T, B: S.B, wake: S.wake, wakeAt: S.wakeAt, over: S.over, firm: S.bed.firm, smart: S.temp.smart, path: S.light.path, auto: S.scent.auto, timer: S.sound.timer, ab: S.ab },
+    result: SAVE.src === "report" && SAVE.attach ? { score: scoreNow(), base: SCORE, snorePenalty: snorePenalty(curSnore()), efficiency: 94, deepPct: pct("D"), remPct: pct("R"), wakeups: 1, sample: true, snore: curSnore() } : null,
+  }));
+}
+function loadLocal() { try { const a = JSON.parse(store.get("kd-lab-records") || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function saveLocal(rec) {
+  const a = loadLocal(); a.unshift({ ...rec, id: "local-" + Date.now().toString(36) });
+  if (!store.set("kd-lab-records", JSON.stringify(a.slice(0, 50)))) return false;
+  REC.local = loadLocal(); return true;
+}
+async function saveRecord(rec) {
+  if (REC.col) {
+    const ref = REC.col.doc();
+    for (let i = 0; i < 2; i++) {
+      try { await ref.set(rec); return "team"; } catch (e) {
+        const code = e && e.code;
+        if (code === "unavailable" && i === 0) { await new Promise((r) => setTimeout(r, 500 + Math.random() * 700)); continue; }
+        if (code === "quota_exceeded") return "quota";
+        break;
+      }
+    }
+  }
+  return saveLocal(rec) ? "local" : "fail";
+}
+async function doSave(btn) {
+  const nameEl = $("#save-name"), err = $("#save-err");
+  const name = (nameEl.value || "").trim().replace(/\s+/g, " ").slice(0, 40);
+  if (!name) { err.textContent = "ใส่ชื่อเล่นหรือรหัสลูกค้าก่อน ทีมจะได้รู้ว่าเป็นค่าของใคร"; nameEl.focus(); return; }
+  SAVE.name = name;
+  const note = ($("#save-note").value || "").trim().slice(0, 200);
+  btn.disabled = true; btn.lastChild.textContent = "กำลังบันทึก…";
+  const where = await saveRecord(buildRecord(name, note));
+  btn.disabled = false; btn.lastChild.textContent = "บันทึกและส่งให้ทีม";
+  if (where === "team") { closeSheet(); toast(`บันทึกค่าของ ${name} แล้ว ดูได้ในแท็บบันทึก`); }
+  else if (where === "local") { closeSheet(); renderSaved(); toast("บันทึกไว้ในเครื่องนี้แล้ว (ลิงก์นี้ส่งให้ทีมไม่ได้)"); }
+  else err.textContent = where === "quota" ? "พื้นที่บันทึกเต็ม ลบรายการเก่าในแท็บบันทึกก่อน" : "บันทึกไม่ได้ เบราว์เซอร์นี้ปิดการเก็บข้อมูลไว้ ลองปิดโหมดส่วนตัว";
+}
+async function initDb() {
+  REC.local = loadLocal();
+  let db = null;
+  try { db = window.claude && typeof window.claude.use === "function" ? await window.claude.use("db") : null; } catch (e) { db = null; }
+  if (!db) { REC.state = "local"; renderSaved(); return; }
+  REC.col = db.collection("profiles");
+  const timer = setTimeout(() => { if (REC.state === "loading") { REC.state = "slow"; renderSaved(); } }, 10000);
+  REC.col.orderBy("savedAt", "desc").limit(200).onSnapshot((snap) => {
+    REC.items = snap.docs.map((d) => ({ ...(d.data() || {}), id: d.id }));
+    if (!snap.metadata.fromCache) { clearTimeout(timer); REC.state = "live"; }
+    renderSaved();
+  }, () => { clearTimeout(timer); REC.state = "error"; renderSaved(); });
+}
+const SYNC = {
+  loading: ["", "กำลังโหลดบันทึกของทีม…"],
+  live: ["live", "ซิงก์กับทีมแล้ว"],
+  slow: ["", "ยังติดต่อฐานข้อมูลไม่ได้ รายการที่เห็นอาจยังไม่ใช่ล่าสุด"],
+  error: ["warn", "เชื่อมต่อฐานข้อมูลไม่ได้ บันทึกใหม่จะเก็บไว้ในเครื่องนี้"],
+  local: ["", "เปิดนอก claude.ai จึงบันทึกไว้ในเครื่องนี้เท่านั้น"],
+};
+const allRecs = () => [...REC.items.map((r) => ({ ...r, _local: false })), ...REC.local.map((r) => ({ ...r, _local: true }))]
+  .sort((a, b) => String(b.savedAt || "").localeCompare(String(a.savedAt || "")));
+function cleanSn(x) { /* ข้อมูลจากฐานข้อมูล (คนอื่นเขียนได้) → ตัวเลขที่ปลอดภัย · รายการเก่าไม่มี snore = null */
+  if (!x || typeof x !== "object") return null;
+  const n = (v) => (Number.isFinite(+v) ? Math.max(0, Math.round(+v)) : 0);
+  return { real: x.real === true, minutes: n(x.minutes), count: n(x.count), episodes: n(x.episodes), snoreMin: n(x.snoreMin), maxDb: n(x.maxDb), floorDb: n(x.floorDb), level: SN_LV[x.level] ? x.level : "none" };
+}
+function snoreTrends(all) { /* คนเดียวกัน (ชื่อเดียวกัน) มีผลกรน 2 คืนขึ้นไป → สรุป 3 คืนล่าสุด ติดไว้ที่การ์ดล่าสุดของคนนั้น */
+  const by = {}, out = {};
+  all.forEach((r) => {
+    const sn = cleanSn(r.result && r.result.snore), k = String(r.name || "").trim().toLowerCase();
+    if (sn && k && sn.minutes >= 30) (by[k] = by[k] || []).push({ id: r.id, sn }); /* คืนที่ฟังไม่ถึง 30 นาทีไม่นับในแนวโน้ม */
+  });
+  Object.values(by).forEach((list) => {
+    if (list.length < 2) return;
+    const last = list.slice(0, 3), rate = (x) => x.sn.snoreMin / Math.max(1, x.sn.minutes);
+    const avg = Math.round(last.reduce((a, x) => a + x.sn.snoreMin, 0) / last.length);
+    const now = rate(last[0]), prev = last.slice(1).reduce((a, x) => a + rate(x), 0) / (last.length - 1);
+    const tr = now < prev * 0.8 - 0.005 ? "แนวโน้มลดลง" : now > prev * 1.2 + 0.005 ? "แนวโน้มเพิ่มขึ้น" : "ใกล้เคียงเดิม";
+    out[last[0].id] = `${last.length} คืนล่าสุด: กรนเฉลี่ย ${avg} นาที/คืน · ${tr}${last.some((x) => !x.sn.real) ? " · มีข้อมูลตัวอย่างรวมอยู่" : ""}`;
+  });
+  return out;
+}
+function recCard(r, trend) {
+  const sn = cleanSn(r.result && r.result.snore);
+  const rows = Array.isArray(r.summary) ? r.summary.slice(0, 8).map((x) => [x && x.k, x && x.v]) : [];
+  const sc = r.result && Number.isFinite(+r.result.score) ? `<span class="score-b" title="Sleep score">${Math.round(+r.result.score)}</span>` : "";
+  const meta = [fmtDate(r.savedAt), PERSONAS[r.persona] ? PERSONAS[r.persona].en : "", r._local ? "ในเครื่องนี้" : ""].filter(Boolean).join(" · ");
+  return `<article class="rec">
+    <div class="rec-h"><div class="rec-who"><b class="rec-n">${esc(r.name || "ไม่ระบุชื่อ")}</b><small>${esc(meta)}</small><small class="num">${esc(r.preset || "")}</small></div>${sc}</div>
+    ${sumHTML(rows)}
+    ${sn ? `<p class="rec-sn"><b>เสียงกรน</b><span>${esc(snoreText(sn))}</span></p>` : ""}
+    ${trend ? `<p class="rec-trend">${esc(trend)}</p>` : ""}
+    ${r.note ? `<p class="rec-note">${esc(r.note)}</p>` : ""}
+    <div class="rec-acts"><button class="btn sm" type="button" data-use="${esc(r.id)}">ใช้ค่านี้ตั้งห้อง</button><button class="btn ghost sm" type="button" data-del="${esc(r.id)}">ลบ</button></div>
+  </article>`;
+}
+function renderSaved() {
+  const host = $("#recs"); if (!host) return;
+  const all = allRecs(), [cls, txt] = SYNC[REC.state] || SYNC.loading, sy = $("#sync");
+  sy.className = "sync " + cls; sy.textContent = txt + (all.length ? ` · ${all.length} รายการ` : "");
+  const tr = snoreTrends(all);
+  host.innerHTML = all.length ? all.map((r) => recCard(r, tr[r.id])).join("")
+    : `<div class="empty"><span class="ic">${ico("i-save")}</span><b>ยังไม่มีบันทึก</b><p>ตั้งค่าห้องในหน้า "คืนนี้" แล้วกด "บันทึกค่าห้อง" หรือบันทึกผลจากหน้า "ผลการนอน" ค่าของแต่ละคนจะขึ้นที่นี่</p><button class="btn ghost sm" type="button" data-go="room">ไปหน้าคืนนี้</button></div>`;
+}
+function cleanOver(o) {
+  const out = {};
+  PHASES.forEach(({ id }) => {
+    const x = o && o[id]; if (!x || typeof x !== "object") return;
+    const y = {}, n = (v, a, b) => (Number.isFinite(+v) && +v >= a && +v <= b ? Math.round(+v) : undefined);
+    if (x.light) y.light = JSON.parse(JSON.stringify({ lux: n(x.light.lux, 0, 300), k: n(x.light.k, 1800, 5000), shut: typeof x.light.shut === "boolean" ? x.light.shut : undefined }));
+    if (x.sound) y.sound = JSON.parse(JSON.stringify({ type: SOUNDS[x.sound.type] ? x.sound.type : undefined, db: n(x.sound.db, 25, 55) }));
+    if (x.scent) y.scent = JSON.parse(JSON.stringify({ type: SCENTS[x.scent.type] ? x.scent.type : undefined, lvl: n(x.scent.lvl, 0, 100) }));
+    if (n(x.incline, 0, 15) !== undefined) y.incline = n(x.incline, 0, 15);
+    out[id] = y;
+  });
+  return out;
+}
+function applyRecord(id) {
+  const r = allRecs().find((x) => x.id === id); if (!r) return;
+  const st = r.state || {}, P = parsePreset(r.preset);
+  if (P) { S.P = P; store.set("kd-lab-preset", P.code); }
+  S.T = clamp(Math.round(+st.T) || S.P.t, T_MIN, T_MAX);
+  S.B = clamp(Math.round(+st.B) || 33, B_MIN, B_MAX);
+  S.wake = WAKES[st.wake] ? st.wake : S.P.wake;
+  S.wakeAt = clamp(Math.round(+st.wakeAt / 15) * 15 || 420, 300, 570);
+  S.over = cleanOver(st.over);
+  if (FIRM[st.firm]) S.bed.firm = st.firm;
+  if (typeof st.smart === "boolean") S.temp.smart = st.smart;
+  if (typeof st.path === "boolean") S.light.path = st.path;
+  if (typeof st.auto === "boolean") S.scent.auto = st.auto;
+  if (["30", "60", "all"].includes(st.timer)) S.sound.timer = st.timer;
+  if (st.ab === "A" || st.ab === "B") S.ab = st.ab;
+  applyPhase("wind"); go("room");
+  toast(`ตั้งห้องตามบันทึกของ ${r.name || "ลูกค้า"} แล้ว`);
+}
+let delArm = null, delT = 0;
+async function onDelete(btn, id) {
+  if (delArm !== id) {
+    delArm = id; btn.textContent = "แตะอีกครั้งเพื่อลบ"; btn.classList.add("danger");
+    clearTimeout(delT); delT = setTimeout(() => { delArm = null; renderSaved(); }, 4000);
+    return;
+  }
+  delArm = null; clearTimeout(delT); btn.disabled = true;
+  let ok = false;
+  if (id.startsWith("local-")) { ok = store.set("kd-lab-records", JSON.stringify(loadLocal().filter((r) => r.id !== id))); REC.local = loadLocal(); }
+  else if (REC.col) { try { await REC.col.doc(id).delete(); ok = true; } catch (e) { ok = false; } }
+  toast(ok ? "ลบบันทึกแล้ว" : "ลบไม่ได้ ลิงก์นี้อาจไม่มีสิทธิ์แก้ข้อมูล");
+  renderSaved();
+}
+
+/* ---------- การกระทำ ---------- */
+function applyPresetInput() {
+  const P = parsePreset($("#preset-in").value);
+  if (!P) { $("#preset-err").textContent = "รหัสยังไม่ถูกต้อง ตัวอย่างที่ใช้ได้: KD-AB-T24-L0-BN45-WL"; return; }
+  S.P = P; S.T = P.t; S.wake = P.wake; S.over = {}; store.set("kd-lab-preset", P.code);
+  closeSheet(); applyPhase(S.phase); renderPlan();
+  toast(`ตั้งห้องตาม ${P.code} แล้ว`);
+}
+function openSave(src) { SAVE.src = src; SAVE.attach = true; openSheet("save"); }
+function confirmBook() {
+  const sel = $(".opt[data-date][aria-pressed='true']");
+  closeSheet(); toast(`จองคืน${sel ? sel.dataset.label : "ถัดไป"} แล้ว (ตัวอย่าง)`);
+}
+
+document.addEventListener("input", (e) => {
+  const el = e.target, v = +el.value;
+  switch (el.id) {
+    case "s-lux": S.light.lux = v; setOver("light", { lux: v }); break;
+    case "s-k": S.light.k = v; setOver("light", { k: v }); $$(".opt[data-kp]").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.kp === v))); break;
+    case "s-db": S.sound.db = v; setOver("sound", { db: v }); break;
+    case "s-lvl":
+      S.scent.lvl = v;
+      if (S.scent.type === "off" && v > 0) S.scent.type = S.lastScent || "lavender";
+      setOver("scent", { type: S.scent.type, lvl: v });
+      break;
+    case "s-inc": S.bed.incline = v; setOver("incline", v); break;
+    case "preset-in": $("#preset-err").textContent = ""; return;
+    case "save-name": $("#save-err").textContent = ""; return;
+    default: return;
+  }
+  setFill(el); live();
+});
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button, [data-close]");
+  if (!t) return;
+  const d = t.dataset;
+  if (d.tab) return go(d.tab);
+  if (d.go) return go(d.go);
+  if (d.phase) return applyPhase(d.phase);
+  if (d.open) return openSheet(d.open);
+  if (t.hasAttribute("data-close")) return closeSheet();
+  if (t.hasAttribute("data-begin")) return S.phase === "wake" ? go("report") : beginNight();
+  if (d.d) return step(t.closest("[data-step]").dataset.step, +d.d);
+  if (d.use) return applyRecord(d.use);
+  if (d.del) return onDelete(t, d.del);
+  if (d.snd) { S.sound.type = d.snd; if (d.snd === "quiet") S.sound.db = 30; setOver("sound", { type: S.sound.type, db: S.sound.db }); pressIn(t); return live(); }
+  if (d.sct) { S.scent.type = d.sct; if (d.sct !== "off") { S.lastScent = d.sct; if (!S.scent.lvl) S.scent.lvl = 40; } setOver("scent", { type: S.scent.type, lvl: S.scent.lvl }); pressIn(t); return live(); }
+  if (d.kp) {
+    S.light.k = +d.kp; if (!S.light.lux) S.light.lux = 30;
+    setOver("light", { k: S.light.k, lux: S.light.lux });
+    const k = $("#s-k"); if (k) { k.value = S.light.k; setFill(k); }
+    pressIn(t); return live();
+  }
+  if (d.cur) { S.light.shut = d.cur === "shut"; setOver("light", { shut: S.light.shut }); pressIn(t); return live(); }
+  if (d.wk) { S.wake = d.wk; pressIn(t); return applyPhase(S.phase); }
+  if (d.firm) { S.bed.firm = d.firm; pressIn(t); return live(); }
+  if (d.timer) { S.sound.timer = d.timer; pressIn(t); return live(); }
+  if (d.ab) { S.ab = d.ab; pressIn(t); return renderRoutine(); }
+  if (d.ex) { $("#preset-in").value = d.ex; $("#preset-err").textContent = ""; return; }
+  if (d.date) return pressIn(t);
+  if (t.classList.contains("sw")) return toggleSw(t);
+  switch (t.id) {
+    case "preset-tag": return openSheet("preset");
+    case "preset-apply": return applyPresetInput();
+    case "wake": return wakeUp();
+    case "mon-t": return monToggle();
+    case "sleep-back": endSleep(); return applyPhase("pre");
+    case "save-room": return openSave("room");
+    case "save-report": return openSave("report");
+    case "save-plan": return openSave("plan");
+    case "save-ok": return doSave(t);
+    case "book": return openSheet("book");
+    case "book-ok": return confirmBook();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeSheet();
+  if (e.key === "Enter" && e.target.id === "preset-in") applyPresetInput();
+  if (e.key === "Enter" && e.target.id === "save-name") { e.preventDefault(); doSave($("#save-ok")); }
+});
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS.includes(h)) go(h); });
+let rT = 0;
+window.addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => { if ($("#v-report").classList.contains("on")) { renderHyp(); snoreLine(curSnore()); } }, 150); });
+
+/* ---------- เริ่มต้น ---------- */
+document.documentElement.style.setProperty("--ktrack", KTRACK);
+drapeFolds(); drapeFit();
+if (window.ResizeObserver) new ResizeObserver(() => drapeFit()).observe($(".scene .cv")); else window.addEventListener("resize", drapeFit);
+$("#ring-bar").style.strokeDasharray = RING; $("#ring-bar").style.strokeDashoffset = RING * (1 - scoreNow() / 100);
+applyPhase("wind"); renderPlan(); renderLog(); renderLegend(); renderSaved();
+go(VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "room", { keepScroll: true });
+initDb();
+})();
+
+</script>
+
+</body></html>
