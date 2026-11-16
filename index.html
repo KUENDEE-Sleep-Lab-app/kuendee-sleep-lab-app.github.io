@@ -564,21 +564,10 @@ body.day .rec-alert{color:var(--earth)}
 /* v9: ยังไม่เสียบ = แดงหม่นโทนดิน (ไม่ใช่แดงสด) · เสียบแล้ว = เขียวเซจ */
 .batt.bad{border-color:rgba(219,121,101,.6);background:rgba(219,121,101,.1);color:#f0a896}
 .batt.ok{border-color:rgba(143,174,144,.55);background:rgba(109,141,110,.12);color:#b4d0b5}
-/* v9.2 iPhone: ปุ่มเปิดวิธีตั้งคำสั่งลัด (ไม่ใช่ปุ่มยืนยันว่าเสียบแล้ว) + ขั้นตอนในแผ่น */
-.batt-how{appearance:none;flex:none;border:1px solid rgba(244,234,224,.22);background:rgba(244,234,224,.06);color:rgba(244,234,224,.86);
-  border-radius:999px;padding:6px 12px;font-size:12.5px;white-space:nowrap}
-.copy-row{display:flex;flex-direction:column;gap:8px;margin-top:16px}
-.copy-row .copy-l{font-size:13px;color:var(--fg-2)}
-.sheet .copy-row .btn{margin-top:0}
-.copy-row .inp{height:44px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--fg-3)}
-.copy-row .btn{min-height:50px;font-size:15px}
-.rt-live{margin-top:14px;padding:10px 14px;border-radius:14px;border:1px dashed var(--line-2);font-size:13.5px;line-height:1.5;color:var(--fg-2)}
-.rt-live.ok{border:1px solid rgba(143,174,144,.55);background:rgba(109,141,110,.12);color:#b4d0b5}
-.rt-live.bad{border:1px solid rgba(219,121,101,.6);background:rgba(219,121,101,.1);color:#f0a896}
-.how{margin-top:14px}
-.how>b{display:block;font-family:var(--num);font-weight:400;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
-.steps{margin:8px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.55;color:var(--fg-2)}
-.steps b{font-weight:500;color:var(--fg)}
+/* v9.4 ไม่มี Battery API: ทั้งป้ายเป็นปุ่มแตะยืนยันเอง */
+.batt.tap{padding:0}
+.batt-tap{appearance:none;background:none;border:0;color:inherit;font:inherit;display:flex;align-items:center;gap:8px;text-align:left;width:100%;min-height:44px;padding:7px 14px;border-radius:16px}
+.batt-tap:active{transform:scale(.98)}
 .mon{width:100%;max-width:380px;padding:12px 14px 10px;border-radius:18px;border:1px solid rgba(244,234,224,.12);background:rgba(244,234,224,.04);text-align:left}
 .mon-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .mon-h b{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:400;color:rgba(244,234,224,.82)}
@@ -1300,28 +1289,6 @@ const SHEETS = {
     <p class="hint">ห้องจะตั้งค่าจากแผนล่าสุดของคุณ และ Night Designer จะดูผลคืนนี้ก่อนคุณมาถึง</p>
     <button class="btn" type="button" id="book-ok">ยืนยันการจอง</button></div>`,
   save: () => saveSheet(),
-  charge: () => {
-    const on = rtLink(true), off = rtLink(false);
-    const ios = `<div class="how"><b>iPhone และ iPad</b><ol class="steps">
-      <li>เปิดแอป <b>คำสั่งลัด</b> (Shortcuts) แตะแท็บ <b>ระบบอัตโนมัติ</b> (Automation) แล้วแตะ <b>+</b></li>
-      <li>เลือก <b>ที่ชาร์จ</b> (Charger) ติ๊ก <b>เชื่อมต่อแล้ว</b> (Is Connected) อย่างเดียว เลือก <b>เรียกใช้ทันที</b> (Run Immediately) แล้วแตะ <b>ถัดไป</b></li>
-      <li>เลือก <b>ระบบอัตโนมัติเปล่าใหม่</b> (New Blank Automation) เพิ่มการทำงาน <b>รับเนื้อหาของ URL</b> (Get Contents of URL) วาง <b>ลิงก์ตอนเสียบ</b> แล้วแตะ <b>เสร็จสิ้น</b></li>
-      <li>ทำอีกหนึ่งอันแบบเดียวกัน แต่ติ๊ก <b>ตัดการเชื่อมต่อแล้ว</b> (Is Disconnected) และวาง <b>ลิงก์ตอนถอด</b></li>
-    </ol></div>`;
-    const and = `<div class="how"><b>Android</b><ol class="steps">
-      <li>เปิดเว็บนี้ด้วย <b>Chrome</b> แอปจะตรวจสายชาร์จเองทันที ไม่ต้องตั้งอะไร</li>
-      <li>ถ้าใช้เบราว์เซอร์อื่น ตั้งแอประบบอัตโนมัติของเครื่องให้เรียก <b>ลิงก์ตอนเสียบ</b> เมื่อเริ่มชาร์จ และ <b>ลิงก์ตอนถอด</b> เมื่อหยุดชาร์จ</li>
-    </ol></div>`;
-    const row = (k, label, link) => `<div class="copy-row"><span class="copy-l">${label}</span><input class="inp" id="charge-link-${k}" readonly value="${esc(link)}" aria-label="${label}">
-      <button class="btn${k === "off" ? " ghost" : ""}" type="button" id="charge-copy-${k}">คัดลอก${label}</button></div>`;
-    return head("i-batt", "ให้มือถือบอกสถานะชาร์จเอง") + `<div class="field">
-    <p class="muted" style="font-size:14px">ตั้งครั้งเดียว แล้วป้ายจะเปลี่ยนเองทันทีที่เสียบหรือถอดสาย ไม่ต้องเปิดหน้าใหม่</p>
-    ${ANDROID ? and + ios : ios + and}
-    ${on ? row("on", "ลิงก์ตอนเสียบ", on) + row("off", "ลิงก์ตอนถอด", off) + `<p class="rt-live" id="charge-live" role="status" aria-live="polite"></p>`
-      : `<p class="hint">เบราว์เซอร์นี้ปิดที่เก็บข้อมูลไว้ จึงสร้างลิงก์ไม่ได้ เปิดแอปจากเว็บของทีมในหน้าต่างปกติ</p>`}
-    <p class="hint">มือถือส่งแค่สัญญาณว่า "เสียบ" หรือ "ถอด" ผ่านบริการส่งสัญญาณ ntfy.sh ด้วยรหัสสุ่มของเครื่องนี้ ไม่มีชื่อหรือข้อมูลส่วนตัว</p></div>` +
-    why("ทำไมบางเครื่องตรวจเองได้ บางเครื่องต้องตั้ง", "Chrome บน Android บอกสถานะชาร์จให้เว็บได้ แอปจึงตรวจเอง ส่วนทุกเบราว์เซอร์บน iPhone และบางเบราว์เซอร์บน Android ปิดข้อมูลนี้ไว้ แอปจึงให้มือถือส่งสัญญาณมาแทน ป้ายจะบอกเวลาที่มือถือแจ้งครั้งล่าสุด");
-  },
 };
 let lastFocus = null;
 function openSheet(kind) {
@@ -1413,12 +1380,12 @@ function beginNight() {
   sleepSub();
   tick(); clockT = setInterval(tick, 10000);
   lmReset();
-  $("#batt").textContent = ""; startMonitor(); checkBattery();
+  $("#batt").textContent = ""; BATT.manual = false; startMonitor(); checkBattery();
   setTimeout(() => $("#sleep-back").focus({ preventScroll: true }), 300);
 }
 function endSleep() {
   const sl = $("#sleep"); sl.classList.remove("on"); sl.setAttribute("aria-hidden", "true");
-  clearInterval(clockT); lmStop(); stopMonitor(); store.set("kd-sleep-hb", "0"); rtStop();
+  clearInterval(clockT); lmStop(); stopMonitor();
   $("#sheet").classList.remove("over-sleep");
 }
 function wakeUp() {
@@ -1808,110 +1775,32 @@ window.addEventListener("pagehide", () => stopMonitor()); /* ปิดแท็�
    เบราว์เซอร์ที่บอกสถานะแบต (navigator.getBattery: Chrome/Edge/Samsung บน Android, Windows, Mac): ไม่ได้เสียบ = แดงหม่น · เสียบแล้ว = เขียวเซจ
    เปลี่ยนเองทันทีเมื่อเสียบ/ถอด (chargingchange) และตรวจซ้ำทุก 30 วินาทีกันเหตุการณ์หลุด
    Safari (iPhone/iPad/Mac) และ Firefox ไม่บอกสถานะแบตให้เว็บเลย → ไม่เดาว่าเสียบหรือไม่: ป้ายสีกลางเตือนให้เสียบ + บอกว่าเปิดด้วย Chrome จะตรวจให้อัตโนมัติ */
-/* v9.2 มือถือที่เบราว์เซอร์ไม่มี Battery API (ทุกเบราว์เซอร์บน iPhone/iPad ใช้ WebKit เดียวกัน · Firefox บน Android): ให้ระบบอัตโนมัติของมือถือบอกแทน (iPhone = แอปคำสั่งลัด)
-   ข้อความบนจอใช้คำว่า "มือถือ" ไม่เจาะจงรุ่น (ผู้ใช้สั่ง 16 พ.ย.) · ลิงก์ ?charging=1 ใช้ได้กับทุกเครื่อง · เครื่องที่มี Battery API ใช้ค่าจริงเสมอ ไม่ดูสัญญาณนี้
-   ผู้ใช้ตั้งระบบอัตโนมัติครั้งเดียว: เสียบที่ชาร์จ → เปิดลิงก์หน้านี้ท้าย ?charging=1 → หน้าจำเวลาที่ iPhone แจ้ง (localStorage kd-charge) แล้วลบ ?charging ออกจากลิงก์
-   ป้าย: แจ้งเสียบภายใน CHARGE_FRESH_H ชม. = เขียว (บอกเวลาที่แจ้ง ไม่เดาว่ายังเสียบอยู่) · เคยตั้งแล้วแต่คืนนี้ยังไม่แจ้ง = แดง · ยังไม่เคยตั้ง = สีกลาง + ปุ่มวิธีตั้ง
-   ?charging=0 (ถ้าผู้ใช้ตั้งตอนถอดสายเพิ่มเอง) = แดง · แท็บอื่นที่เปิดอยู่รับค่าจากเหตุการณ์ storage ทันที */
-const BATT = { b: null, asked: false, iv: 0 };
-const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-const ANDROID = /Android/i.test(navigator.userAgent);
-const CHARGE_KEY = "kd-charge", CHARGE_FRESH_H = 14, SLEEP_HB = "kd-sleep-hb";
-const chargeSig = () => { try { const c = JSON.parse(store.get(CHARGE_KEY) || "null"); return c && typeof c.t === "number" ? c : null; } catch (e) { return null; } };
-(function chargeFromUrl() { /* เปิดมาจากระบบอัตโนมัติของมือถือ */
-  const q = new URLSearchParams(location.search), v = q.get("charging");
-  if (v !== "1" && v !== "0") return;
-  store.set(CHARGE_KEY, JSON.stringify({ on: v === "1", t: Date.now() }));
-  q.delete("charging");
-  try { history.replaceState(null, "", location.pathname + (q.toString() ? "?" + q : "") + location.hash); } catch (e) { /* ไม่เป็นไร */ }
-  const other = Date.now() - (+store.get(SLEEP_HB) || 0) < 60000; /* อีกแท็บกำลังอยู่ในโหมดหลับ */
-  setTimeout(() => toast(v === "1" ? (other ? "มือถือแจ้งว่าเสียบสายชาร์จแล้ว · โหมดหลับเปิดอยู่อีกแท็บ กลับไปแท็บนั้นได้เลย" : "มือถือแจ้งว่าเสียบสายชาร์จแล้ว")
-    : "มือถือแจ้งว่าถอดสายชาร์จแล้ว"), 400);
-})();
-window.addEventListener("storage", (e) => { if (e.key === CHARGE_KEY) battShow(); });
-/* v9.3 สัญญาณสด (ผู้ใช้สั่ง 16 พ.ย. "ให้ detect แบบ real time"): ระบบอัตโนมัติของมือถือเรียกลิงก์ ntfy.sh/<รหัสสุ่ม>/publish?message=1|0 เบื้องหลัง (iPhone: การทำงาน "รับเนื้อหาของ URL" ไม่เปิดหน้าใหม่ ไมค์ไม่หยุด)
-   หน้านี้เปิด EventSource ไปที่ ntfy.sh/<รหัส>/sse?since=12h → ได้สัญญาณล่าสุดย้อนหลัง 12 ชม. + สัญญาณใหม่ทันที · ส่งแค่ "1"/"0" ไม่มีข้อมูลส่วนตัว
-   รหัสสุ่ม (kd-charge-topic) สร้างตอนเปิดแผ่นวิธีตั้งครั้งแรก → คนที่ไม่เคยตั้งไม่มีการต่อออกนอกเว็บ · kd-charge-rt = on|off|both (เคยได้สัญญาณชนิดไหนแล้ว)
-   ลิงก์รุ่น v9.2 (?charging=1 เปิดหน้า) ยังใช้ได้ แต่ไม่รู้ตอนถอดและเปิดแท็บใหม่ทุกครั้ง */
-const RT = { es: null, host: "https://ntfy.sh/" }, RT_TOPIC = "kd-charge-topic", RT_OK = "kd-charge-rt";
-function rtTopic(make) {
-  let t = store.get(RT_TOPIC);
-  if (!t && make) {
-    const a = new Uint8Array(16);
-    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for (let i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256);
-    t = "kd" + Array.from(a, (x) => (x % 36).toString(36)).join("");
-    if (!store.set(RT_TOPIC, t)) return null;
-  }
-  return /^kd[a-z0-9]{16}$/.test(t || "") ? t : null;
-}
-const rtLink = (on) => { const t = rtTopic(true); return t ? `${RT.host}${t}/publish?message=${on ? 1 : 0}` : ""; };
-function rtStart() { /* เริ่มรับสัญญาณสด (เฉพาะเครื่องที่ไม่มี Battery API และเคยเปิดวิธีตั้งแล้ว) */
-  const t = rtTopic(false);
-  if (!t || RT.es || BATT.b || !window.EventSource) return;
-  try {
-    RT.es = new EventSource(`${RT.host}${t}/sse?since=12h`);
-    RT.es.onmessage = (e) => {
-      let m; try { m = JSON.parse(e.data); } catch (err) { return; }
-      if (!m || m.event !== "message" || (m.message !== "1" && m.message !== "0")) return;
-      const on = m.message === "1", at = (m.time || 0) * 1000, c = chargeSig(), seen = store.get(RT_OK) || "";
-      store.set(RT_OK, seen === "both" || (seen && seen !== (on ? "on" : "off")) ? "both" : on ? "on" : "off");
-      if (!c || at >= c.t - 999) store.set(CHARGE_KEY, JSON.stringify({ on, t: at, rt: 1 })); /* เวลาของ ntfy เป็นวินาทีเต็ม */
-      battShow(); rtLive();
-    };
-  } catch (e) { RT.es = null; }
-}
-function rtStop() { if (RT.es) { try { RT.es.close(); } catch (e) { /* ไม่เป็นไร */ } RT.es = null; } }
-function rtLive() { /* บรรทัดสถานะในแผ่นวิธีตั้ง: เห็นผลทันทีตอนลองเสียบ/ถอด */
-  const el = $("#charge-live"); if (!el) return;
-  const c = chargeSig(), seen = store.get(RT_OK) || "";
-  if (!seen || !c || !c.rt) { el.className = "rt-live"; el.textContent = "รอสัญญาณจากมือถือ… ตั้งเสร็จแล้วลองเสียบหรือถอดสายดู"; return; }
-  el.className = "rt-live " + (c.on ? "ok" : "bad");
-  el.textContent = `ได้รับสัญญาณ${c.on ? "เสียบสาย" : "ถอดสาย"} ${hmAt(c.t)} · ` +
-    (seen === "both" ? "ตั้งครบแล้วทั้งตอนเสียบและตอนถอด" : seen === "on" ? "ลองถอดสายเพื่อทดสอบอีกอัน" : "ลองเสียบสายเพื่อทดสอบอีกอัน");
-}
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && RT.es) { rtStop(); rtStart(); } }); /* กลับมาที่หน้า: ต่อใหม่ รับสัญญาณที่พลาดระหว่างพัก */
-window.addEventListener("pagehide", () => { store.set(SLEEP_HB, "0"); rtStop(); }); /* ปิดหรือออกจากหน้า = โหมดหลับของแท็บนี้จบแล้ว (สลับแท็บไม่ยิง pagehide) */
+/* v9.4 (ผู้ใช้สั่ง 16 พ.ย. "ที่เสียบชาร์จ เอาเป็น manual"): เบราว์เซอร์ที่ไม่มี Battery API (ทุกเบราว์เซอร์บน iPhone/iPad, Safari Mac, Firefox) = ป้ายแตะยืนยันเอง
+   เริ่มค่ำคืนทุกครั้ง = แดง "ยังไม่ได้เสียบสายชาร์จ · แตะเมื่อเสียบแล้ว" → แตะ = เขียว "เสียบสายชาร์จแล้ว · แตะถ้าถอดสาย" (ไม่จำข้ามคืน)
+   เครื่องที่มี Battery API ยังตรวจเองอัตโนมัติ ไม่มีปุ่ม · ระบบคำสั่งลัด/ntfy.sh ของ v9.2–v9.3 เอาออกทั้งหมด ไม่มีการต่อออกนอกเว็บ */
+const BATT = { b: null, asked: false, iv: 0, manual: false };
 async function checkBattery() {
   if (!BATT.asked) {
     BATT.asked = true;
     try { BATT.b = navigator.getBattery ? await navigator.getBattery() : null; } catch (e) { BATT.b = null; }
     if (BATT.b) { BATT.b.addEventListener("chargingchange", battShow); BATT.b.addEventListener("levelchange", battShow); }
   }
-  clearInterval(BATT.iv);
-  if (!BATT.b) rtStart();
-  BATT.iv = setInterval(() => { if (!sleepOn()) return clearInterval(BATT.iv); if (RT.es && RT.es.readyState === 2) { rtStop(); rtStart(); } battShow(); }, BATT.b ? 30000 : 10000); /* ไม่มี Battery API: ตรวจถี่ขึ้นเพื่อเขียนจังหวะว่าโหมดหลับเปิดอยู่ */
+  clearInterval(BATT.iv); if (BATT.b) BATT.iv = setInterval(() => (sleepOn() ? battShow() : clearInterval(BATT.iv)), 30000);
   battShow();
 }
-const hmAt = (t) => { const d = new Date(t); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
 function battShow() {
   const el = $("#batt"), b = BATT.b;
   if (!sleepOn()) { el.className = "batt"; el.innerHTML = ""; return; }
-  let cls, msg, how = false;
   if (b) {
     const pct = Math.round(b.level * 100);
-    [cls, msg] = b.charging ? ["batt ok", `เสียบสายชาร์จแล้ว · แบต ${pct}%`] : ["batt bad", `ยังไม่ได้เสียบสายชาร์จ · แบต ${pct}% · การฟังเสียงใช้แบตทั้งคืน`];
-  } else {
-    store.set(SLEEP_HB, String(Date.now()));
-    const c = chargeSig(), fresh = c && Date.now() - c.t < CHARGE_FRESH_H * 3600e3;
-    if (fresh && c.on) [cls, msg] = ["batt ok", `เสียบสายชาร์จแล้ว · มือถือแจ้งเมื่อ ${hmAt(c.t)}`];
-    else if (fresh) [cls, msg] = ["batt bad", `ถอดสายชาร์จแล้ว · มือถือแจ้งเมื่อ ${hmAt(c.t)} · การฟังเสียงใช้แบตทั้งคืน`];
-    else if (c) [cls, msg] = ["batt bad", "มือถือยังไม่แจ้งว่าเสียบสายชาร์จคืนนี้ · เสียบสายก่อนนอน การฟังเสียงใช้แบตทั้งคืน"];
-    else if (IOS || ANDROID) [cls, msg] = ["batt", "เสียบสายชาร์จไว้ทั้งคืน · ตั้งให้มือถือบอกเองได้ ครั้งเดียว"];
-    else [cls, msg] = ["batt", "เสียบสายชาร์จไว้ทั้งคืน · เบราว์เซอร์นี้ไม่บอกสถานะชาร์จ เปิดด้วย Chrome จะตรวจให้อัตโนมัติ"];
-    how = (IOS || ANDROID) && !(fresh && store.get(RT_OK)); /* ยังไม่ได้ตั้งแบบสด (หรือสัญญาณขาดไป) = มีปุ่มวิธีตั้ง */
+    const [cls, msg] = b.charging ? ["batt ok", `เสียบสายชาร์จแล้ว · แบต ${pct}%`] : ["batt bad", `ยังไม่ได้เสียบสายชาร์จ · แบต ${pct}% · การฟังเสียงใช้แบตทั้งคืน`];
+    el.className = cls; el.innerHTML = ico("i-batt") + `<span>${msg}</span>`; return;
   }
-  el.className = cls;
-  el.innerHTML = ico("i-batt") + `<span>${msg}</span>` + (how ? `<button class="batt-how" type="button" id="batt-how">วิธีตั้ง</button>` : "");
+  const on = BATT.manual;
+  el.className = "batt tap " + (on ? "ok" : "bad");
+  el.innerHTML = `<button class="batt-tap" type="button" id="batt-tap" aria-pressed="${on}">${ico("i-batt")}<span>${on ? "เสียบสายชาร์จแล้ว · แตะถ้าถอดสาย" : "ยังไม่ได้เสียบสายชาร์จ · แตะที่นี่เมื่อเสียบแล้ว"}</span></button>`;
 }
-function chargeHow() { /* เปิดทับหน้าหลับ ไมค์ฟังต่อ · เริ่มรับสัญญาณทันทีเพื่อให้ลองแล้วเห็นผล · เลื่อนช่องลิงก์ไปท้ายสุดให้เห็น message=1 / 0 ที่ต่างกัน */
-  $("#sheet").classList.add("over-sleep"); openSheet("charge"); rtStart(); rtLive();
-  $$("#sheet .copy-row .inp").forEach((i) => { i.scrollLeft = i.scrollWidth; });
-}
-function chargeCopy(btn, on) {
-  const link = rtLink(on), label = btn.textContent, done = () => { btn.textContent = "คัดลอกแล้ว"; setTimeout(() => (btn.textContent = label), 2200); };
-  const fallback = () => { const i = $("#charge-link-" + (on ? "on" : "off")); i.focus(); i.select(); try { document.execCommand("copy"); done(); } catch (e) { btn.textContent = "กดค้างที่ลิงก์เพื่อคัดลอก"; } };
-  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, fallback); else fallback();
-}
+function battToggle() { BATT.manual = !BATT.manual; battShow(); const t = $("#batt-tap"); if (t) t.focus({ preventScroll: true }); }
 
 let toastT = 0;
 function toast(msg) {
@@ -2347,9 +2236,7 @@ document.addEventListener("click", (e) => {
     case "mon-t": return monToggle();
     case "lm-go": return measureLight();
     case "lm-adj": return lmAdjust();
-    case "batt-how": return chargeHow();
-    case "charge-copy-on": return chargeCopy(t, true);
-    case "charge-copy-off": return chargeCopy(t, false);
+    case "batt-tap": return battToggle();
     case "sleep-back": endSleep(); return applyPhase("pre");
     case "save-room": return openSave("room");
     case "save-report": return openSave("report");
