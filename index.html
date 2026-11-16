@@ -1818,6 +1818,7 @@ const chargeLink = () => location.origin + location.pathname + "?charging=1#room
     : "มือถือแจ้งว่าถอดสายชาร์จแล้ว"), 400);
 })();
 window.addEventListener("storage", (e) => { if (e.key === CHARGE_KEY) battShow(); });
+window.addEventListener("pagehide", () => store.set(SLEEP_HB, "0")); /* ปิดหรือออกจากหน้า = โหมดหลับของแท็บนี้จบแล้ว (สลับแท็บไม่ยิง pagehide) */
 async function checkBattery() {
   if (!BATT.asked) {
     BATT.asked = true;
