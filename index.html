@@ -483,6 +483,13 @@ body.day .rec-alert{color:var(--earth)}
 .actions{display:grid;grid-template-columns:1fr;gap:10px}
 .proto{font-size:11.5px;color:var(--fg-4);text-align:center;margin-top:6px}
 
+.goal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:12px}
+.goal div{padding:10px 12px;border-radius:12px;background:var(--card-2);min-width:0}
+.goal div.on{background:var(--btn-bg);color:var(--btn-fg)}
+.goal small{display:block;font-size:12px;color:var(--fg-3)}
+.goal div.on small{color:var(--btn-fg);opacity:.7}
+.goal b{display:block;font-weight:400;font-family:var(--num);font-size:18px;font-variant-numeric:tabular-nums}
+.goal p{grid-column:1/-1;font-size:12.5px;color:var(--fg-3);margin-top:2px}
 /* ---------- บันทึกค่าห้องรายคน ---------- */
 .sum{margin:0}
 .sum div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.45}
@@ -822,6 +829,7 @@ body.day .rec-alert{color:var(--earth)}
         <div class="stack">
           <div class="card">
             <div class="card-h"><h3>คืนนี้ที่บ้าน</h3><small id="routine-note"></small></div>
+            <div class="goal" id="plan-goal" aria-label="เวลานอนของคุณ"></div>
             <div class="seg" id="plan-ab" role="group" aria-label="เลือกแผน">
               <button type="button" data-ab="A" aria-pressed="true">แผน A · คืนปกติ</button>
               <button type="button" data-ab="B" aria-pressed="false">แผน B · คืนที่กลับดึก</button>
@@ -952,14 +960,31 @@ const WAKES = {
 };
 const DEFAULT_PRESET = "KD-AB-T24-L0-BN45-WL";
 
-/* รหัส: KD-{persona}{รอง}-T{°C}-L{0 มืดสนิท|1 สลัว}-{Q30|PN40|BN45|NT35|MU35}-W{L แสง|S เสียง|LS ทั้งคู่} */
+/* รหัส: KD-{persona}{รอง}-T{°C}-L{0 มืดสนิท|1 สลัว}-{Q30|PN40|BN45|NT35|MU35}-W{L แสง|S เสียง|LS ทั้งคู่}[เวลาตื่น HHMM]
+   ส่วนเสริม (ไม่ใส่ก็ได้ เรียงลำดับใดก็ได้ ต่อท้ายด้วย -):
+     B{HHMM}  เวลาเข้านอนจริงวันทำงาน   เช่น B0200
+     H{ชม.}    หลับจริงต่อคืน (ปัดลง)     เช่น H4 = ไม่ถึง 5 ชม.
+     X{ตัวอักษร} กิจกรรมที่ชอบก่อนนอน   J เขียนบันทึก · R อ่านหนังสือ · S ยืดเหยียด/โยคะ · M สมาธิ/หายใจ · B อาบน้ำอุ่น · P ฟังเพลง/พอดแคสต์
+   ตัวอย่าง: KD-B-T24-L1-NT40-WL0600-B0200-H4-XJ · รหัสแบบเดิมที่ไม่มีส่วนเสริมยังใช้ได้ */
+const ACTS = { J: "เขียนบันทึก", R: "อ่านหนังสือ", S: "ยืดเหยียด", M: "นั่งสมาธิ", B: "อาบน้ำอุ่น", P: "ฟังเพลงช้า" };
+const toMin = (s) => { const h = +s.slice(0, 2), m = +s.slice(2); return h < 24 && m < 60 ? h * 60 + m : null; };
 function parsePreset(raw) {
   const code = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
-  const m = /^KD-([ABCDN])([ABCD]?)-T(2[3-7])-L([01])-(Q30|PN4[05]|BN4[05]|NT(?:35|40)|MU35)-W(LS|L|S)$/.exec(code);
+  const m = /^KD-([ABCDN])([ABCD]?)-T(2[3-7])-L([01])-(Q30|PN4[05]|BN4[05]|NT(?:35|40)|MU35)-W(LS|L|S)(\d{4})?((?:-[A-Z0-9]+)*)$/.exec(code);
   if (!m) return null;
   const s = m[5], kind = s.replace(/\d+/, "");
-  return { code, p: m[1], s: m[2], t: +m[3], dim: m[4] === "1",
-    sound: { type: { Q: "quiet", PN: "pink", BN: "brown", NT: "rain", MU: "music" }[kind], db: +s.match(/\d+/)[0] }, wake: m[6] };
+  const P = { code, p: m[1], s: m[2], t: +m[3], dim: m[4] === "1",
+    sound: { type: { Q: "quiet", PN: "pink", BN: "brown", NT: "rain", MU: "music" }[kind], db: +s.match(/\d+/)[0] }, wake: m[6],
+    up: null, bed: null, h: null, acts: [] };
+  if (m[7]) { const u = toMin(m[7]); if (u == null) return null; P.up = Math.round(u / 15) * 15 % 1440; }
+  for (const seg of m[8].split("-").filter(Boolean)) {
+    let x;
+    if ((x = /^B(\d{4})$/.exec(seg))) { P.bed = toMin(x[1]); if (P.bed == null) return null; }
+    else if ((x = /^H(\d{1,2})$/.exec(seg))) { const h = +x[1]; if (h < 2 || h > 12) return null; P.h = h; }
+    else if ((x = /^X([A-Z]+)$/.exec(seg))) P.acts = [...new Set(x[1].split("").filter((c) => ACTS[c]))];
+    /* ส่วนเสริมที่ยังไม่รู้จัก ข้ามไป เผื่อแบบประเมินรุ่นใหม่เพิ่มข้อมูล */
+  }
+  return P;
 }
 
 /* ---------- อุณหภูมิตามงานวิจัยการนอน (ที่มาอยู่ใน README) ----------
@@ -1002,9 +1027,10 @@ function phaseBase(id) {
 }
 
 /* ---------- สถานะของห้อง ---------- */
+const clampWake = (m) => Math.max(240, Math.min(720, m)); /* ตื่นได้ 04:00–12:00 */
 const P0 = parsePreset(new URLSearchParams(location.search).get("preset")) || parsePreset(store.get("kd-lab-preset")) || parsePreset(DEFAULT_PRESET);
 const S = {
-  P: P0, T: P0.t, B: 33, wake: P0.wake, wakeAt: 7 * 60,
+  P: P0, T: P0.t, B: 33, wake: P0.wake, wakeAt: P0.up != null ? clampWake(P0.up) : 7 * 60,
   over: {}, /* ค่าที่ปรับเองในแต่ละช่วง เช่น { wind: { light: { lux: 100 } } } */
   phase: "wind",
   light: { lux: 150, k: 2700, shut: false, path: true },
@@ -1247,7 +1273,7 @@ const segF = (name, label, items, cur, hint = "") => `<div class="field"><div cl
 const bigStep = (k, text, label) => `<div class="field center"><div class="stepper big" data-step="${k}"><button type="button" data-d="-1" aria-label="ลด${label}">−</button><output class="o-${k}">${text}</output><button type="button" data-d="1" aria-label="เพิ่ม${label}">+</button></div><p class="hint">${label}</p>`;
 const why = (title, text) => `<div class="field why"><b>${title}</b><p>${text}</p></div>`;
 const KPRE = { 1800: { th: "แสงเทียน", d: "1800 K · ไฟกลางคืน" }, 2700: { th: "อำพันอุ่น", d: "2700 K · ผ่อนคลาย" }, 4000: { th: "ขาวนวล", d: "4000 K · อ่านหนังสือ" }, 5000: { th: "แสงเช้า", d: "5000 K · ตอนตื่น" } };
-const EXAMPLES = ["KD-AB-T24-L0-BN45-WL", "KD-C-T25-L1-PN40-WLS", "KD-D-T26-L0-NT35-WS"];
+const EXAMPLES = ["KD-AB-T24-L0-BN45-WL", "KD-C-T25-L1-PN40-WLS", "KD-D-T26-L0-NT35-WS", "KD-B-T24-L1-NT40-WL0600-B0200-H4-XJ"];
 const NIGHTS = [["sat", "เสาร์ 14 พ.ย.", "ว่าง 2 ห้อง"], ["sun", "อาทิตย์ 15 พ.ย.", "ว่าง 1 ห้อง"], ["fri", "ศุกร์ 20 พ.ย.", "ว่าง 3 ห้อง"], ["sat2", "เสาร์ 21 พ.ย.", "ว่าง 2 ห้อง"]];
 const SHEETS = {
   temp: () => head("i-temp", "อุณหภูมิห้อง") + bigStep("temp", S.T + "°", "อุณหภูมิตอนหลับ") +
@@ -1327,7 +1353,7 @@ function pressIn(btn) {
 function step(k, d) {
   if (k === "temp") S.T = clamp(S.T + d, T_MIN, T_MAX);
   else if (k === "bed") S.B = clamp(S.B + d, B_MIN, B_MAX);
-  else if (k === "wake") S.wakeAt = clamp(S.wakeAt + d * 15, 300, 570);
+  else if (k === "wake") S.wakeAt = clampWake(S.wakeAt + d * 15);
   else if (k === "light") { S.light.lux = nextIn(LUX, S.light.lux, d); setOver("light", { lux: S.light.lux }); }
   else if (k === "sound") {
     if (S.sound.type === "quiet") {
@@ -1935,42 +1961,115 @@ function animateScore() {
   requestAnimationFrame(stepN);
 }
 
-/* ---------- แผนกลับบ้าน ---------- */
-const KIT = [
-  ["i-diffuser", "Night Mist Diffuser", "เครื่องพ่นไอหอมตั้งเวลา ปิดเองหลังหลับ 30 นาที"],
-  ["i-bottle", "Lavender Night Oil", "กลิ่นเดียวกับที่ใช้ในห้องเมื่อคืน"],
-  ["i-lamp", "Dawn Light", "โคมแสงปลุก 2000 → 5000 K ตั้งเวลาเหมือนใน Sleep Lab"],
-];
+/* ---------- แผนกลับบ้าน: สร้างจากรหัสของแต่ละคน ----------
+   ยึดเวลาตื่นเดิมทุกวัน · เป้าหมายอยู่บนเตียง 7 ชม. 30 นาที (หลับจริงราว 7 ชม.)
+   ถ้าเข้านอนจริงห่างจากเป้า ขยับทีละ 30 นาที ทุก 3 คืน ไม่กระโดดทีเดียว */
+const IN_BED = 450, SHIFT = 30, SHIFT_NIGHTS = 3;
+const mod = (m) => ((m % 1440) + 1440) % 1440;
+const at = (m) => hhmm(mod(m));
+const diffMin = (a, b) => mod(a - b + 720) - 720; /* a ช้ากว่า b กี่นาที (−720…720) */
+const durTxt = (m) => `${Math.floor(m / 60)} ชม.${m % 60 ? ` ${m % 60} นาที` : ""}`;
+const has = (P, k) => P.p === k || P.s === k;
+function sleepPlan() {
+  const P = S.P, up = S.wakeAt, target = mod(up - IN_BED);
+  if (P.bed == null) return { up, target, now: null, tonight: target, gap: 0, nights: 0 };
+  const gap = diffMin(P.bed, target); /* บวก = ตอนนี้นอนดึกกว่าเป้า */
+  const tonight = Math.abs(gap) <= SHIFT ? target : mod(P.bed - Math.sign(gap) * SHIFT);
+  return { up, target, now: P.bed, tonight, gap, nights: Math.ceil(Math.abs(gap) / SHIFT) * SHIFT_NIGHTS };
+}
+/* กิจกรรมก่อนนอน: เลือกจากที่ชอบก่อน แล้วค่อยตามบุคลิกการนอน */
+function windAct(P) {
+  const lib = {
+    J: ["เขียนบันทึก 10 นาที", "จดเรื่องที่ค้างในหัวและสิ่งที่ต้องทำพรุ่งนี้ ความคิดจะไม่วนตอนปิดไฟ"],
+    R: ["อ่านหนังสือเล่มกระดาษ", "ใต้แสงสลัว เลือกเล่มที่ไม่ลุ้นจนวางไม่ลง"],
+    S: ["ยืดเหยียดเบา ๆ 10 นาที", "คอ บ่า หลัง สะโพก ช้า ๆ ไม่ให้เหนื่อย"],
+    M: ["นั่งสมาธิ 10 นาที", "ตามลมหายใจ ไม่ต้องพยายามให้หลับ"],
+    B: ["อาบน้ำอุ่น 40–42°C", "10–15 นาที ร่างกายจะเย็นลงหลังอาบ ช่วยให้หลับเร็ว"],
+    P: ["ฟังเพลงช้าหรือพอดแคสต์เบา ๆ", "ตั้งเวลาปิดเอง 30 นาที"],
+  };
+  const pick = P.acts.find((a) => lib[a]) || { A: "J", B: "S", C: "R", D: "S", N: "R" }[P.p];
+  return lib[pick];
+}
+function routineA(pl) {
+  const P = S.P, b = pl.tonight, up = pl.up, w = resolved("wind"), d = resolved("deep").sound;
+  const snd = d.type === "quiet" ? "ห้องเงียบ" : `${SOUNDS[d.type].th} ${d.db} dB(A)`;
+  const scent = w.scent.type === "off" ? "" : ` · เปิดกลิ่น${SCENTS[w.scent.type].th}`;
+  const act = windAct(P), restless = has(P, "A") || has(P, "B"), bath = act[0].startsWith("อาบน้ำ");
+  /* [นาทีก่อนปิดไฟ, หัวข้อ, รายละเอียด] เรียงตามเวลา */
+  const pre = [[480, "กาแฟหรือชาแก้วสุดท้าย", "คาเฟอีนอยู่ในร่างกายได้ราว 8 ชั่วโมง"]];
+  if (P.p === "D") pre.push([180, "เปิดไฟในบ้านสว่างตามปกติ", "อย่าเพิ่งหรี่เร็วเกินไป ช่วยให้ไม่ง่วงเร็วและไม่ตื่นเช้าเกินเวลา"]);
+  if (has(P, "B") && !bath) pre.push([120, "อาบน้ำอุ่น 40–42°C", "10–15 นาที ก่อนนอน 1–2 ชั่วโมง ช่วยให้หลับเร็วขึ้น"]);
+  pre.push([90, `หรี่ไฟเป็น ${w.light.k} K`, `แสงอุ่นและต่ำ${scent}`]);
+  pre.push([60, "วางมือถือไว้นอกห้องนอน", "ตั้งปลุกไว้แล้ว ไม่ต้องหยิบอีก"]);
+  pre.push([bath ? 120 : 45, ...act]);
+  if (restless) pre.push([15, "หายใจ 4-7-8 สี่รอบบนเตียง", "เข้า 4 · กลั้น 7 · ออก 8"]);
+  const r = pre.sort((x, y) => y[0] - x[0]).map(([o, h, t]) => [at(b - o), h, t]);
+  r.push([at(b), "ปิดไฟ", `${snd} · แอร์ ${S.T}°C${S.temp.smart ? ` แล้วอุ่นขึ้นเองเป็น ${lateT()}°C` : ""}`]);
+  if (restless) r.push(["ถ้าตื่น", "นอนไม่หลับเกิน 20 นาที ลุกจากเตียง", "ทำอะไรเบา ๆ ใต้แสงสลัว ง่วงแล้วค่อยกลับมา เตียงจะได้เป็นที่สำหรับหลับ"]);
+  if (has(P, "D")) r.push(["ถ้าตื่น", "ตื่นก่อนเวลา ไม่ดูนาฬิกา ไม่เปิดมือถือ", "หายใจช้า ๆ อยู่ในความมืด ร่างกายมีโอกาสหลับต่อ"]);
+  r.push(S.wake === "S" ? [at(up - 15), "เสียงนกค่อย ๆ ดังขึ้น", "ตั้งปลุกด้วยเสียงธรรมชาติ ไม่ใช่เสียงกริ่ง"] : [at(up - 30), S.wake === "LS" ? "แสงและเสียงปลุกเริ่ม" : "แสงปลุกค่อย ๆ สว่าง", "ร่างกายตื่นเองตอนหลับตื้น"]);
+  r.push([at(up), `ตื่น เปิดม่านรับแสงเช้า ${has(P, "C") ? 30 : 10} นาที`, has(P, "C") ? "สำคัญที่สุดสำหรับนาฬิกาชีวิตที่คลาด ตั้งเวลาเดิมทุกวัน รวมวันหยุด" : "ตั้งเวลาเดิมทุกวัน รวมวันหยุด"]);
+  return r;
+}
+function routineB(pl) {
+  const P = S.P, late = mod(pl.tonight + 60), up = pl.up, d = resolved("deep").sound;
+  const snd = d.type === "quiet" ? "ห้องเงียบ" : `${SOUNDS[d.type].th} ${d.db} dB(A)`, left = mod(up - late);
+  const r = [
+    [at(late - 30), "อาบน้ำอุ่นสั้น ๆ 5 นาที", `เปิดแอร์ ${S.T}°C รอไว้ก่อน`],
+    [at(late - 15), "แสงสลัว 2200 K", "ไม่เปิดจออีก" + (resolved("wind").scent.type === "off" ? "" : ` · กลิ่น${SCENTS[resolved("wind").scent.type].th}`)],
+  ];
+  if (has(P, "A")) r.push([at(late - 10), "จดเรื่องที่ค้างสั้น ๆ 3 บรรทัด", "ให้หัวรู้ว่าพรุ่งนี้ค่อยคิดต่อ"]);
+  r.push([at(late - 5), "หายใจ 4-7-8 สองรอบ", "ช่วยให้หัวเงียบเร็วขึ้น"], [at(late), "ปิดไฟ", snd]);
+  r.push([at(up), "ตื่นเวลาเดิม", "รับแสงเช้าทันที นาฬิกาในร่างกายจะไม่คลาด"]);
+  if (left < 360) r.push(["บ่าย", "งีบได้ไม่เกิน 20 นาที ก่อน 15:00", `คืนนี้อยู่บนเตียงแค่ ${durTxt(left)} งีบสั้น ๆ ชดเชยได้ ไม่กระทบคืนถัดไป`]);
+  return r;
+}
+function renderGoal(pl) {
+  const P = S.P, el = $("#plan-goal");
+  if (pl.now == null || Math.abs(pl.gap) <= SHIFT) {
+    el.innerHTML = `<div><small>เข้านอน</small><b>${at(pl.tonight)}</b></div><div><small>ตื่น</small><b>${at(pl.up)}</b></div><div><small>อยู่บนเตียง</small><b>${durTxt(mod(pl.up - pl.tonight))}</b></div>`;
+    return;
+  }
+  const weeks = Math.max(1, Math.round(pl.nights / 7));
+  el.innerHTML = `<div><small>ตอนนี้</small><b>${at(pl.now)}</b></div><div class="on"><small>คืนนี้</small><b>${at(pl.tonight)}</b></div><div><small>เป้าหมาย</small><b>${at(pl.target)}</b></div>
+    <p>${pl.gap > 0 ? "เข้านอนเร็วขึ้น" : "เข้านอนช้าลง"}ครั้งละ ${SHIFT} นาที ทุก ${SHIFT_NIGHTS} คืน ตื่น ${at(pl.up)} เท่าเดิม · ถึงเป้าในราว ${weeks} สัปดาห์${P.h ? ` · ตอนนี้หลับราว ${P.h}–${P.h + 1} ชม. เป้าหมาย 7 ชม.` : ""}</p>`;
+}
+function buildKit() {
+  const P = S.P, w = resolved("wind"), d = resolved("deep").sound, k = [];
+  const per = {
+    A: ["i-spark", "Night Notes", "สมุดจดก่อนนอน มีหน้า \"เรื่องที่ค้าง\" กับ \"พรุ่งนี้ทำอะไร\""],
+    B: ["i-bed", "Weighted Blanket", "ผ้าห่มถ่วงน้ำหนักราว 10% ของน้ำหนักตัว ช่วยให้ร่างกายนิ่งขึ้น"],
+    C: ["i-moon", "Blackout Eye Mask", "ผ้าปิดตาทึบแสง สำหรับคืนที่ต้องนอนช้ากว่าเดิม"],
+    D: ["i-moon", "Blackout Curtain Clip", "คลิปปิดขอบม่าน กันแสงเช้าที่ปลุกก่อนเวลา"],
+  }[P.p];
+  if (per) k.push(per);
+  if (w.scent.type !== "off") k.push(["i-diffuser", `Night Mist · ${SCENTS[w.scent.type].th}`, "เครื่องพ่นไอหอมตั้งเวลา ปิดเองหลังหลับ 30 นาที กลิ่นเดียวกับห้องเมื่อคืน"]);
+  if (d.type !== "quiet") k.push(["i-sound", "Night Sound Speaker", `เปิด${SOUNDS[d.type].th} ${d.db} dB(A) ทั้งคืน ห่างหัวเตียงราว 1 เมตร`]);
+  k.push(S.wake === "S" ? ["i-sunrise", "Dawn Chime", `นาฬิกาปลุกเสียงนก ค่อย ๆ ดังขึ้นก่อน ${at(S.wakeAt)}`]
+    : ["i-lamp", "Dawn Light", `โคมแสงปลุก 2000 → 5000 K เริ่ม ${at(S.wakeAt - 30)} เหมือนใน Sleep Lab`]);
+  return k.slice(0, 4);
+}
 function renderPlan() {
-  const per = PERSONAS[S.P.p], d = resolved("deep"), w = resolved("wind");
-  $("#plan-lead").textContent = `แผนของ ${per.en} · ${per.th} ออกแบบจากผลเมื่อคืนและแบบประเมินของคุณ เริ่มใช้ที่บ้านได้คืนนี้`;
+  const P = S.P, per = PERSONAS[P.p], d = resolved("deep"), w = resolved("wind"), pl = sleepPlan();
+  const sec = P.s ? ` + ${PERSONAS[P.s].en}` : "";
+  $("#plan-lead").textContent = `แผนของ ${per.en}${sec} · ${per.th} ออกแบบจากผลเมื่อคืนและแบบประเมินของคุณ ตื่น ${at(pl.up)} ทุกวัน เริ่มใช้ที่บ้านได้คืนนี้`;
   const els = [
-    ["i-sun", "Light", "อุ่นและสลัว", `${w.light.k} K ก่อนนอน 1 ชม. แล้ว${d.light.lux > 0 ? "เหลือแสงสลัว 1800 K ตอนหลับ" : "ปิดมืดสนิทตอนหลับ"}`],
-    ["i-sound", "Sound", soundText(d.sound).replace(" · ", " "), "เปิดจากลำโพงที่ห่างหัวเตียงราว 1 เมตร"],
-    ["i-leaf", "Scent", w.scent.type === "off" ? "ไม่ใช้กลิ่น" : SCENTS[w.scent.type].th, "3–4 หยดในเครื่องพ่น ตั้งปิดเองหลังหลับ 30 นาที"],
+    ["i-sun", "Light", d.light.lux > 0 ? "อุ่นและสลัว" : "อุ่น แล้วมืดสนิท", `${w.light.k} K ตั้งแต่ ${at(pl.tonight - 90)} แล้ว${d.light.lux > 0 ? "เหลือแสงสลัว 1800 K ตอนหลับ" : "ปิดมืดสนิทตอนหลับ"}`],
+    ["i-sound", "Sound", soundText(d.sound).replace(" · ", " "), d.sound.type === "quiet" ? "ปิดหน้าต่างและประตูให้สนิท ใช้ที่อุดหูถ้ามีเสียงรบกวน" : "เปิดจากลำโพงที่ห่างหัวเตียงราว 1 เมตร"],
+    ["i-leaf", "Scent", w.scent.type === "off" ? "ไม่ใช้กลิ่น" : SCENTS[w.scent.type].th, w.scent.type === "off" ? "เปิดหน้าต่างระบายอากาศช่วงเย็น" : `3–4 หยดในเครื่องพ่นตอน ${at(pl.tonight - 90)} ตั้งปิดเองหลังหลับ 30 นาที`],
     ["i-temp", "Temp", `${S.T}° → ${lateT()}° → ${wakeT()}°C`, "หลับลึกดีที่สุดราว 24–26°C ความชื้น 50–60% ตั้งโหมด Sleep ให้แอร์อุ่นขึ้นเองช่วงดึก"],
     ["i-bed", "Bed", `ในผ้าห่ม ${S.B}°C`, `ที่นอน${FIRM[S.bed.firm]} ผ้าห่มอุ่นพอดีในห้องที่เย็นสบาย หมอนสูงพอให้คอตรงแนวหลัง`],
   ];
-  $("#els").innerHTML = els.map(([i, en, v, tip]) => `<div class="el"><span class="ic">${ico(i)}</span><div><small>${en}</small><b>${esc(v)}</b><p>${tip}</p></div></div>`).join("");
-  $("#kit").innerHTML = KIT.map(([i, n, dd]) => `<div class="kit-i"><span class="ic">${ico(i)}</span><div><b>${n}</b><p>${dd}</p></div></div>`).join("");
+  $("#els").innerHTML = els.map(([i, en, v, tip]) => `<div class="el"><span class="ic">${ico(i)}</span><div><small>${en}</small><b>${esc(v)}</b><p>${esc(tip)}</p></div></div>`).join("");
+  $("#kit").innerHTML = buildKit().map(([i, n, dd]) => `<div class="kit-i"><span class="ic">${ico(i)}</span><div><b>${esc(n)}</b><p>${esc(dd)}</p></div></div>`).join("");
   renderRoutine();
 }
 function renderRoutine() {
-  const P = S.P, t = S.T, d = resolved("deep").sound, snd = d.type === "quiet" ? "ห้องเงียบ" : `${SOUNDS[d.type].th} ${d.db} dB(A)`;
-  const first = P.p === "B" || P.s === "B" ? ["อาบน้ำอุ่น 40–42°C", "10–15 นาที ก่อนนอน 1–2 ชั่วโมง ช่วยให้หลับเร็วขึ้น"] : ["จดเรื่องที่ค้างในหัวลงกระดาษ", "วางความคิดไว้ก่อน พรุ่งนี้ค่อยหยิบกลับมา"];
-  const A = [
-    ["21:00", ...first], ["21:30", "หรี่ไฟเป็น 2700 K", "เปิดกลิ่นลาเวนเดอร์ในห้องนอน"],
-    ["22:00", "วางมือถือไว้นอกห้องนอน", "ยืดเหยียดเบา ๆ 10 นาที"], ["22:40", "หายใจ 4-7-8 สี่รอบบนเตียง", "เข้า 4 · กลั้น 7 · ออก 8"],
-    ["23:00", "ปิดไฟ", `${snd} · แอร์ ${t}°C`], [hhmm(S.wakeAt - 30), "แสงปลุกค่อย ๆ สว่าง", "ร่างกายตื่นเองตอนหลับตื้น"],
-    [hhmm(S.wakeAt), "ตื่น เปิดม่านรับแสงเช้า 10 นาที", "ตั้งเวลาเดิมทุกวัน รวมวันหยุด"],
-  ];
-  const B = [
-    ["23:30", "อาบน้ำอุ่นสั้น ๆ 5 นาที", `เปิดแอร์ ${t}°C รอไว้ก่อน`], ["23:45", "แสงสลัว 2200 K", "ไม่เปิดจออีก · กลิ่นลาเวนเดอร์"],
-    ["23:55", "หายใจ 4-7-8 สองรอบ", "ช่วยให้หัวเงียบเร็วขึ้น"], ["00:00", "ปิดไฟ", snd],
-    [hhmm(S.wakeAt), "ตื่นเวลาเดิม", "รับแสงเช้าทันที นาฬิกาในร่างกายจะไม่คลาด"],
-  ];
-  $("#routine").innerHTML = (S.ab === "A" ? A : B).map(([tm, h, s]) => `<li><time>${tm}</time><p>${h}<small>${s}</small></p></li>`).join("");
-  $("#routine-note").textContent = S.ab === "A" ? `เข้านอน 23:00 · ตื่น ${hhmm(S.wakeAt)}` : "นอนช้าได้ แต่ตื่นเวลาเดิม";
+  const pl = sleepPlan();
+  renderGoal(pl);
+  const rows = S.ab === "A" ? routineA(pl) : routineB(pl);
+  $("#routine").innerHTML = rows.map(([tm, h, s]) => `<li><time>${esc(tm)}</time><p>${esc(h)}<small>${esc(s)}</small></p></li>`).join("");
+  $("#routine-note").textContent = S.ab === "A" ? `เข้านอน ${at(pl.tonight)} · ตื่น ${at(pl.up)}` : `เข้านอน ${at(pl.tonight + 60)} · ตื่นเวลาเดิม ${at(pl.up)}`;
 }
 
 /* ---------- บันทึกค่าห้องรายคน: ฐานข้อมูลของหน้า (ทีมเห็นร่วมกัน) · เปิดนอก claude.ai = เก็บในเครื่อง ---------- */
@@ -2142,7 +2241,7 @@ function applyRecord(id) {
   S.T = clamp(Math.round(+st.T) || S.P.t, T_MIN, T_MAX);
   S.B = clamp(Math.round(+st.B) || 33, B_MIN, B_MAX);
   S.wake = WAKES[st.wake] ? st.wake : S.P.wake;
-  S.wakeAt = clamp(Math.round(+st.wakeAt / 15) * 15 || 420, 300, 570);
+  S.wakeAt = clampWake(Math.round(+st.wakeAt / 15) * 15 || 420);
   S.over = cleanOver(st.over);
   if (FIRM[st.firm]) S.bed.firm = st.firm;
   if (typeof st.smart === "boolean") S.temp.smart = st.smart;
@@ -2171,8 +2270,8 @@ async function onDelete(btn, id) {
 /* ---------- การกระทำ ---------- */
 function applyPresetInput() {
   const P = parsePreset($("#preset-in").value);
-  if (!P) { $("#preset-err").textContent = "รหัสยังไม่ถูกต้อง ตัวอย่างที่ใช้ได้: KD-AB-T24-L0-BN45-WL"; return; }
-  S.P = P; S.T = P.t; S.wake = P.wake; S.over = {}; store.set("kd-lab-preset", P.code);
+  if (!P) { $("#preset-err").textContent = "รหัสยังไม่ถูกต้อง ตัวอย่างที่ใช้ได้: KD-AB-T24-L0-BN45-WL หรือ KD-B-T24-L1-NT40-WL0600-B0200-H4"; return; }
+  S.P = P; S.T = P.t; S.wake = P.wake; S.over = {}; if (P.up != null) S.wakeAt = clampWake(P.up); store.set("kd-lab-preset", P.code);
   closeSheet(); applyPhase(S.phase); renderPlan();
   toast(`ตั้งห้องตาม ${P.code} แล้ว`);
 }
